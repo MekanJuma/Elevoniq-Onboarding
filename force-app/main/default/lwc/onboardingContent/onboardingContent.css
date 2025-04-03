@@ -1,0 +1,169 @@
+.content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    gap: 3rem;
+}
+
+/* Step Indicator Styles */
+.step-indicator {
+    width: 300px;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.step-container {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem 0;
+}
+
+.step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f0f3f9;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.step-circle.active {
+    background: #e8f0fe;
+    border-color: #1a73e8;
+}
+
+.step-circle.completed {
+    background: #1a73e8;
+    border-color: #1a73e8;
+}
+
+.step-number {
+    color: #5f6368;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.step-circle.active .step-number {
+    color: #1a73e8;
+}
+
+.step-circle.completed .step-icon {
+    --sds-c-icon-color-foreground-default: white;
+    --sds-c-icon-color-foreground: white;
+}
+
+.step-details {
+    flex-grow: 1;
+}
+
+.step-label {
+    font-weight: 600;
+    color: #202124;
+    margin-bottom: 0.25rem;
+    font-size: 0.9375rem;
+}
+
+.step-description {
+    color: #5f6368;
+    font-size: 0.8125rem;
+}
+
+.step-line {
+    position: absolute;
+    left: 16px;
+    top: 48px;
+    bottom: 0;
+    width: 2px;
+    background: #e0e0e0;
+    transition: background-color 0.3s ease;
+}
+
+.step-line.completed {
+    background: #1a73e8;
+}
+
+/* Content Area Styles */
+.content-area {
+    flex-grow: 1;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+/* Welcome Step Styles */
+.welcome-container {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.welcome-container h1 {
+    font-size: 2rem;
+    color: #202124;
+    margin-bottom: 1rem;
+}
+
+.welcome-container p {
+    color: #5f6368;
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+}
+
+.get-started-button {
+    --sds-c-button-brand-color-background: #1a73e8;
+    --sds-c-button-brand-color-background-hover: #1557b0;
+    --sds-c-button-brand-color-border: transparent;
+    --sds-c-button-brand-text-color: white;
+}
+
+/* Step Content Styles */
+.step-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step-content h2 {
+    font-size: 1.5rem;
+    color: #202124;
+    margin-bottom: 1rem;
+}
+
+.step-content p {
+    color: #5f6368;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.step-form {
+    margin-bottom: 2rem;
+}
+
+/* Navigation Buttons */
+.step-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.back-button {
+    --sds-c-button-text-color: #5f6368;
+}
+
+.next-button {
+    --sds-c-button-brand-color-background: #1a73e8;
+    --sds-c-button-brand-color-background-hover: #1557b0;
+    --sds-c-button-brand-color-border: transparent;
+    --sds-c-button-brand-text-color: white;
+} 

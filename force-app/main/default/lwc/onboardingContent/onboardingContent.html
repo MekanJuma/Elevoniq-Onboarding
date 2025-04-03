@@ -1,0 +1,79 @@
+<template>
+    <div class="content-container">
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <template for:each={steps} for:item="step" for:index="index">
+                <div key={step.id} class={step.containerClass}>
+                    <div class={step.circleClass}>
+                        <template if:true={step.isCompleted}>
+                            <lightning-icon
+                                icon-name="utility:check"
+                                size="x-small"
+                                class="step-icon">
+                            </lightning-icon>
+                        </template>
+                        <template if:false={step.isCompleted}>
+                            <span class="step-number">{step.number}</span>
+                        </template>
+                    </div>
+                    <div class="step-details">
+                        <div class="step-label">{step.label}</div>
+                        <div class="step-description">{step.description}</div>
+                    </div>
+                    <template if:false={step.isLast}>
+                        <div class={step.lineClass}></div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Welcome Step -->
+            <template if:true={isWelcomeStep}>
+                <div class="welcome-container">
+                    <h1>Welcome to Elevoniq, {userData.name}!</h1>
+                    <p>Follow the steps to onboard your properties and link your elevator data with ease.</p>
+                    <lightning-button
+                        variant="brand"
+                        label="Get Started"
+                        onclick={handleGetStarted}
+                        class="get-started-button">
+                    </lightning-button>
+                </div>
+            </template>
+
+            <!-- Dynamic Step Content -->
+            <template if:false={isWelcomeStep}>
+                <div class="step-content">
+                    <template if:true={currentStep}>
+                        <h2>{currentStep.label}</h2>
+                        <p>{currentStep.description}</p>
+                        
+                        <!-- Step Form Container -->
+                        <div class="step-form">
+                            <!-- Form content will be dynamically rendered based on current step -->
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="step-navigation">
+                            <template if:true={showBackButton}>
+                                <lightning-button
+                                    label="Back"
+                                    onclick={handleBack}
+                                    class="back-button">
+                                </lightning-button>
+                            </template>
+                            <lightning-button
+                                variant="brand"
+                                label={nextButtonLabel}
+                                onclick={handleNext}
+                                class="next-button">
+                            </lightning-button>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+</template> 

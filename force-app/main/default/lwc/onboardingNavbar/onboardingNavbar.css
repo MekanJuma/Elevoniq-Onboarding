@@ -1,0 +1,163 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 2rem;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 72px;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.company-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.navbar-right {
+    position: relative;
+}
+
+/* Sign In Button */
+.sign-in-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.sign-in-button:hover {
+    background-color: #1557b0;
+}
+
+.sign-in-button:active {
+    background-color: #174ea6;
+}
+
+.sign-in-icon {
+    --sds-c-icon-color-foreground: white;
+}
+
+/* User Info Styles */
+.user-info {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.user-info:hover {
+    background-color: #f8f9fa;
+}
+
+.user-details {
+    margin-right: 1rem;
+    text-align: right;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #202124;
+    font-size: 0.9375rem;
+}
+
+.company-name {
+    color: #5f6368;
+    font-size: 0.8125rem;
+}
+
+.profile-icon-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.profile-icon {
+    --sds-c-icon-color-foreground-default: #1a73e8;
+}
+
+.dropdown-icon {
+    --sds-c-icon-color-foreground-default: #5f6368;
+    margin-left: 0.25rem;
+}
+
+/* Profile Dropdown Menu */
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 220px;
+    z-index: 1001;
+    padding: 0.5rem 0;
+}
+
+.dropdown-header {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.dropdown-user-info {
+    margin-left: 0.75rem;
+}
+
+.dropdown-user-name {
+    font-weight: 600;
+    color: #202124;
+    font-size: 0.9375rem;
+    margin-bottom: 0.25rem;
+}
+
+.dropdown-company-name {
+    color: #5f6368;
+    font-size: 0.8125rem;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 0.5rem 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-item-icon {
+    margin-right: 0.75rem;
+    --sds-c-icon-color-foreground-default: #5f6368;
+} 

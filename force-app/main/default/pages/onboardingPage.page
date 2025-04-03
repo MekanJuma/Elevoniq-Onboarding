@@ -1,0 +1,22 @@
+<apex:page showHeader="false"
+           sidebar="false"
+           standardStylesheets="false"
+           docType="html-5.0"
+           title="Onboarding"
+           lightningStylesheets="true">
+    
+    <apex:includeLightning />    
+    <div id="LwcId" />
+    <script>
+            $Lightning.use("c:visualforceAuraApplications", function() {
+            $Lightning.createComponent("c:onboardingPageLwc",
+            {
+                note   : 'I am coming from VF Page'
+            },
+            "LwcId",
+            function(cmp) {
+                console.log('Calling the LWC Component');
+            });
+        });
+    </script>
+</apex:page>

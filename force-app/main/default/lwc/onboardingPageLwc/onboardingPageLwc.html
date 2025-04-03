@@ -1,0 +1,38 @@
+<template>
+    <div class="onboarding-page">
+        <!-- Navigation Bar -->
+        <c-onboarding-navbar
+            user-data={userData}
+            onsignout={handleSignOut}>
+        </c-onboarding-navbar>
+
+        <!-- Main Page Content -->
+        <div class="page-content">
+            <!-- Loading Spinner -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+
+            <!-- Error Message -->
+            <template if:true={error}>
+                <c-onboarding-error
+                    title="Error"
+                    message={error}
+                    show-close="true"
+                    show-details={hasErrorDetails}
+                    details={errorDetails}
+                    onclose={handleErrorClose}>
+                </c-onboarding-error>
+            </template>
+
+            <!-- Main Content Container -->
+            <template if:false={isLoading}>
+                <c-onboarding-content
+                    user-data={userData}
+                    onstepchange={handleStepChange}
+                    oncomplete={handleOnboardingComplete}>
+                </c-onboarding-content>
+            </template>
+        </div>
+    </div>
+</template>

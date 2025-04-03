@@ -1,0 +1,27 @@
+.onboarding-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+.page-content {
+    flex: 1;
+    padding-top: 88px; /* navbar height (72px) + some spacing */
+    position: relative;
+    width: 100%;
+}
+
+/* Loading Spinner Container */
+:host > div > .slds-spinner_container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.75);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

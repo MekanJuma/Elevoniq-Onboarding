@@ -1,16 +1,32 @@
-# Salesforce DX Project: Next Steps
+# Elevoniq-Onboarding
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+A Salesforce DX project for the Elevoniq onboarding process. This application provides a streamlined, multi-step onboarding experience for new users.
 
-## How Do You Plan to Deploy Your Changes?
+## Features
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+- Multi-step onboarding process
+- Modern, responsive UI
+- Error handling and validation
+- Progress tracking
+- User data management
 
-## Configure Your Salesforce DX Project
+## Development Setup
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+This is a Salesforce DX project. Follow these steps to get started:
 
-## Read All About It
+1. Set up your [Salesforce DX environment](https://developer.salesforce.com/tools/vscode/)
+2. Clone this repository
+3. Run `sfdx force:org:create` to create a scratch org
+4. Push the source to your org: `sfdx force:source:push`
+5. Open the org: `sfdx force:org:open`
+
+## Project Structure
+
+- `force-app/main/default/lwc/` - Lightning Web Components
+- `force-app/main/default/classes/` - Apex Classes
+- `force-app/main/default/pages/` - Visualforce Pages
+
+## Documentation Resources
 
 - [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
 - [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)

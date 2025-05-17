@@ -1,27 +1,84 @@
-.onboarding-page {
-    min-height: 100vh;
+.container {
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: #f8f9fa;
 }
 
-.page-content {
-    flex: 1;
-    padding-top: 88px; /* navbar height (72px) + some spacing */
+.body-content {
     position: relative;
-    width: 100%;
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    background-color: #f3f2f2;
 }
 
-/* Loading Spinner Container */
-:host > div > .slds-spinner_container {
+.main-content {
+    flex: 1;
+    overflow: auto;
+    padding: 1.5rem;
+    background-color: #f3f2f2;
+    transition: margin-right 0.3s ease;
+}
+
+
+/* Steps Layout */
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* Right Side bar */
+.right-sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 75px;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.75);
-    z-index: 9000;
+    width: 400px;
+    background: white;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: transform 0.3s ease;
+    z-index: 1000;
 }
+
+.right-sidebar c-onboarding-right-sidebar {
+    flex: 1;
+}
+
+.right-sidebar.hidden {
+    transform: translateX(100%);
+}
+
+.resize-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    cursor: ew-resize;
+    background: transparent;
+    transition: background-color 0.2s ease;
+    z-index: 1001;
+}
+
+.resize-handle:hover {
+    background-color: #0070d2;
+}
+
+.main-content.sidebar-open {
+    margin-right: 400px;
+}
+
+
+

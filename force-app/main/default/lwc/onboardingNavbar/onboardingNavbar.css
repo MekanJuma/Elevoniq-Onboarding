@@ -1,27 +1,18 @@
 .navbar {
     display: flex;
     justify-content: space-between;
+    padding: 10px;
+    background-color: #f4f6f9;
     align-items: center;
-    padding: 0.75rem 2rem;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    height: 72px;
+    border-bottom: 1px solid #ddd;
+    min-height: 75px;
+    max-height: 75px;
 }
 
-.navbar-left {
-    display: flex;
-    align-items: center;
-}
-
-.company-logo {
-    height: 40px;
-    width: auto;
-    object-fit: contain;
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0176d3;
 }
 
 .navbar-right {
@@ -52,10 +43,6 @@
     background-color: #174ea6;
 }
 
-.sign-in-icon {
-    --sds-c-icon-color-foreground: white;
-}
-
 /* User Info Styles */
 .user-info {
     display: flex;
@@ -84,6 +71,10 @@
 .company-name {
     color: #5f6368;
     font-size: 0.8125rem;
+    white-space: nowrap;
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .profile-icon-container {

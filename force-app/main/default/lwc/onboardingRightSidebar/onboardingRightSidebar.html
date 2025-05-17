@@ -1,0 +1,38 @@
+<template>
+    <div class="right-sidebar-content">
+        <!-- Fixed Header -->
+        <div class="right-sidebar-header">
+            <h2 class="right-sidebar-title">{title}</h2>
+            <lightning-button-icon
+                icon-name="utility:close"
+                variant="bare"
+                size="small"
+                onclick={closeRightSidebar}
+                class="close-button">
+            </lightning-button-icon>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="right-sidebar-body">
+            <div class="form-content">
+                <div style="height: 1000px;">
+                    Content will go here
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed Footer -->
+        <div class="right-sidebar-footer">
+            <div class="footer-left">
+                <span class="draft-message">Saved as draft</span>
+            </div>
+            <div class="footer-right">
+                <lightning-button 
+                    label="Save" 
+                    variant="brand" 
+                    onclick={handleSave}>
+                </lightning-button>
+            </div>
+        </div>
+    </div>
+</template>

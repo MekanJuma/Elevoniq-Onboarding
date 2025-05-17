@@ -1,0 +1,31 @@
+<template>
+    <div class="step-card">
+        <div class="card-header">
+            <div class="header-content">
+                <div class="icon-container">
+                    <lightning-icon icon-name={icon} size="medium" class="step-icon"></lightning-icon>
+                </div>
+                <h2 class="card-title">{title}</h2>
+            </div>
+        </div>
+        <div class="card-body">
+            <ul class="task-list">
+                <template for:each={tasks} for:item="task">
+                    <li key={task.id} class="task-item">
+                        <div class="task-content">
+                            <span class="task-name">{task.name}</span>
+                            <lightning-button 
+                                label="Complete" 
+                                variant="neutral" 
+                                size="small"
+                                onclick={handleTaskComplete}
+                                data-task-id={task.id}
+                                class="complete-button">
+                            </lightning-button>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </div>
+</template>

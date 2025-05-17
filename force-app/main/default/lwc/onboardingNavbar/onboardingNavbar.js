@@ -1,11 +1,11 @@
 import { LightningElement, api, track } from 'lwc';
-import ElevoniqLogo from '@salesforce/resourceUrl/ElevoniqLogo2';
 
 export default class OnboardingNavbar extends LightningElement {
-    @api userData = {};
+    @track userData = {
+        name: 'John Doe',
+        companyName: 'Hauschild Haus- & Grundstücksverwaltungsgesellschaft mbH'
+    };
     @track isProfileMenuOpen = false;
-
-    logoUrl = ElevoniqLogo;
 
     get hasUserData() {
         return this.userData && this.userData.name && this.userData.companyName;

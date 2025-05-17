@@ -1,0 +1,40 @@
+<template>
+    <div class="sidebar">
+        <button class="add-tab-btn slds-button slds-button_brand slds-button_stretch" onclick={addNewTab}>Neuer Aufzug</button>
+        <div class="or-separator">
+            <hr class="or-line" />
+            <span class="or-text">Oder</span>
+            <hr class="or-line" />
+        </div>
+        <button class="upload-btn slds-button slds-button_neutral slds-button_stretch" onclick={handleUpload}>
+            <lightning-icon icon-name="utility:upload" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+            <span>Datei hochladen</span>
+        </button>
+        <lightning-input
+            type="search"
+            placeholder="Search"
+            onchange={handleSearch}
+            class="search-input">
+        </lightning-input>
+        <div class="tabs">
+            <div class="tab-header">
+                <span>Aufzüge</span>
+            </div>
+            <template for:each={filteredElevators} for:item="tab">
+                <div key={tab.id} class={tab.className}>
+                    <lightning-icon icon-name={tab.icon} size="x-small" class="tab-icon"></lightning-icon>
+                    <span class="tab-label" data-id={tab.id} onclick={selectTab}>{tab.label}</span>
+                    <lightning-button-icon
+                        class="delete-icon slds-icon-text-error"
+                        icon-name="utility:delete"
+                        alternative-text="Delete"
+                        size="medium"
+                        variant="bare"
+                        data-id={tab.id}
+                        onclick={deleteTab}>
+                    </lightning-button-icon>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

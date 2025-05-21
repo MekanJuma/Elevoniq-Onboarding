@@ -16,6 +16,9 @@
 }
 
 .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
     position: relative;
 }
 
@@ -58,7 +61,7 @@
 }
 
 .user-details {
-    margin-right: 1rem;
+    margin-right: 5px;
     text-align: right;
 }
 

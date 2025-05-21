@@ -11,17 +11,31 @@
         <div class="card-body">
             <ul class="task-list">
                 <template for:each={tasks} for:item="task">
-                    <li key={task.id} class="task-item">
+                    <li key={task.id} class={task.className}>
                         <div class="task-content">
                             <span class="task-name">{task.name}</span>
-                            <lightning-button 
-                                label="Complete" 
-                                variant="neutral" 
-                                size="small"
-                                onclick={handleTaskComplete}
-                                data-task-id={task.id}
-                                class="complete-button">
-                            </lightning-button>
+                            <template if:true={task.completed}>
+                                <lightning-button 
+                                    label="Completed" 
+                                    variant="brand-outline" 
+                                    size="small"
+                                    icon-name="utility:check"
+                                    icon-position="right"
+                                    onclick={handleTaskComplete}
+                                    data-task-id={task.id}
+                                    class="completed-button">
+                                </lightning-button>
+                            </template>
+                            <template if:false={task.completed}>
+                                <lightning-button 
+                                    label="Complete" 
+                                    variant="neutral" 
+                                    size="small"
+                                    onclick={handleTaskComplete}
+                                    data-task-id={task.id}
+                                    class="complete-button">
+                                </lightning-button>
+                            </template>
                         </div>
                     </li>
                 </template>

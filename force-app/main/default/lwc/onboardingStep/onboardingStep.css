@@ -60,6 +60,10 @@
     transition: background-color 0.2s ease;
 }
 
+.task-item.completed {
+    background-color: #fdf8f2;
+}
+
 .task-item:last-child {
     border-bottom: none;
 }

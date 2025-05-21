@@ -2,7 +2,7 @@
     <div class="right-sidebar-content">
         <!-- Fixed Header -->
         <div class="right-sidebar-header">
-            <h2 class="right-sidebar-title">{title}</h2>
+            <h2 class="right-sidebar-title">{selectedTask.name}</h2>
             <lightning-button-icon
                 icon-name="utility:close"
                 variant="bare"
@@ -15,18 +15,93 @@
         <!-- Scrollable Content -->
         <div class="right-sidebar-body">
             <div class="form-content">
-                <div style="height: 1000px;">
-                    Content will go here
-                </div>
+                <!-- Custom Section for each section in taskData -->
+                <template for:each={selectedTask.data} for:item="task">
+                    <div key={task.section} class="custom-section">
+                        <div class="custom-section-header">
+                            <lightning-icon icon-name={task.icon} size="small" class="custom-section-icon"></lightning-icon>
+                            <span class="custom-section-title">{task.section}</span>
+                        </div>
+                        <div class="custom-section-body">
+                            <template for:each={task.fields} for:item="field">
+                                <!-- Render text input -->
+                                <template if:true={field.isText}>
+                                    <lightning-input
+                                        key={field.name}
+                                        label={field.name}
+                                        value={field.value}
+                                        name={field.name}
+                                        type="text"
+                                        data-type="text"
+                                        data-name={field.id}
+                                        onchange={handleChange}>
+                                    </lightning-input>
+                                </template>
+                                <!-- Render Email input -->
+                                <template if:true={field.isEmail}>
+                                    <lightning-input
+                                        key={field.name}
+                                        label={field.name}
+                                        value={field.value}
+                                        name={field.name}
+                                        type="email"
+                                        data-type="email"
+                                        data-name={field.id}
+                                        onchange={handleChange}>
+                                    </lightning-input>
+                                </template>
+                                <!-- Render address input -->
+                                <template if:true={field.isAddress}>
+                                    <lightning-input-address
+                                        key={field.name}
+                                        show-address-lookup
+                                        address-lookup-placeholder="Search for an address"
+                                        address-label="Address"
+                                        street-label="Street"
+                                        city-label="City"
+                                        country-label="Country"
+                                        postal-code-label="Zip Code"
+                                        street={field.value.street}
+                                        city={field.value.city}
+                                        country={field.value.country}
+                                        postal-code={field.value.postalCode}
+                                        data-type="address"
+                                        data-name={field.id}
+                                        onchange={handleChange}>
+                                    </lightning-input-address>
+                                </template>
+                                <!-- Render picklist (combobox) -->
+                                <template if:true={field.isPicklist}>
+                                    <lightning-combobox
+                                        key={field.name}
+                                        label={field.name}
+                                        value={field.value}
+                                        options={field.options}
+                                        name={field.name}
+                                        data-type="picklist"
+                                        data-name={field.id}
+                                        onchange={handleChange}>
+                                    </lightning-combobox>
+                                </template>
+                            </template>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
 
         <!-- Fixed Footer -->
         <div class="right-sidebar-footer">
             <div class="footer-left">
-                <span class="draft-message">Saved as draft</span>
+                <!-- <span class="draft-message">Saved as draft</span> -->
             </div>
             <div class="footer-right">
+                <lightning-button 
+                    label="Cancel"
+                    variant="neutral"
+                    onclick={closeRightSidebar}
+                    class="slds-m-right_x-small">
+                </lightning-button>
                 <lightning-button 
                     label="Save" 
                     variant="brand" 

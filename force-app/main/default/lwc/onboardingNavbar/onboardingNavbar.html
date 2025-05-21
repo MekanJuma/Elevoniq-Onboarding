@@ -1,12 +1,18 @@
 <template>
     <div class="navbar">
-        <div class="logo">Elevoniq: Aufzugsregistrierung for KV-00000</div>
+        <div class="logo">Elevoniq: Aufzugsonboarding for KV-00000</div>
         <div class="navbar-right">
+            <lightning-button 
+                label="Publish"
+                variant="brand"
+                onclick={handlePublish}
+                class="publish-button">
+            </lightning-button>
             <template if:true={hasUserData}>
                 <div class="user-info" onclick={handleProfileClick}>
                     <div class="user-details">
                         <div class="user-name">{userData.name}</div>
-                        <div class="company-name">{userData.companyName}</div>
+                        <!-- <div class="company-name">{userData.companyName}</div> -->
                     </div>
                     <div class="profile-icon-container">
                         <lightning-icon 

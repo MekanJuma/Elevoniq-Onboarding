@@ -1,0 +1,20 @@
+<template>
+    <div class="slds-notify_container">
+        <div class={toastClass} role="alert">
+            <span class="slds-assistive-text">{toast.variant}</span>
+            <span class="slds-icon_container slds-m-right_small" title={toast.variant}>
+                <lightning-icon icon-name={toast.icon} size="small" variant="inverse"></lightning-icon>
+            </span>
+            <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small">{toast.title}</h2>
+                <p>{toast.message}</p>
+            </div>
+            <div class="slds-notify__close">
+                <button class="slds-button slds-button_icon slds-button_icon-inverse" onclick={hideToast}>
+                    <lightning-icon icon-name="utility:close" size="x-small" variant="inverse"></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>

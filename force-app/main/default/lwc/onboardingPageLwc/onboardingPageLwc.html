@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+
         <!-- Navigation -->
         <c-onboarding-navbar></c-onboarding-navbar>
 
@@ -7,44 +8,67 @@
             <!-- Left Side Bar -->
             <c-onboarding-left-sidebar
                 elevators={elevators}
+                is-loading={isLoading}
                 onadd={addNewElevator}
                 onselect={selectElevator}
                 ondelete={deleteElevator}
                 onupload={handleUpload}
+                onchange={handleTabLabelChange}
+                onedit={editTab}
             ></c-onboarding-left-sidebar>
 
             <!-- Main Content -->
             <div class="main-content">
-                <template if:true={selectedTabId}>
-                    <div class="steps-grid">
+                <template if:true={isLoading}>
+                    <c-custom-loader></c-custom-loader>
+                </template>
+                <template if:false={isLoading}>
+                    <!-- Error Banner -->
+                    <c-custom-validation-banner
+                        lwc:if={error}
+                        illustrator={error.ILLUSTRATOR}
+                        title={error.TITLE}
+                        message={error.MESSAGE}
+                    ></c-custom-validation-banner>
+
+                    <!-- No Elevators Found Banner -->
+                    <c-custom-validation-banner
+                        lwc:elseif={hasNoElevators}
+                        illustrator={noElevatorsFound.ILLUSTRATOR}
+                        title={noElevatorsFound.TITLE}
+                        message={noElevatorsFound.MESSAGE}
+                    ></c-custom-validation-banner>
+
+                    <!-- Steps Grid -->
+                    <div class="steps-grid" lwc:elseif={selectedElevator}>
                         <!-- Step 1 Card -->
-                         <c-onboarding-step
-                            tasks={step1Tasks}
-                            title="Step 1: Enter Property Details"
+                        <c-onboarding-step
+                            tasks={steps.STEP1.tasks}
+                            title={steps.STEP1.title}
                             icon="utility:home"
                             ontaskcomplete={handleTaskComplete}
-                         ></c-onboarding-step>
+                        ></c-onboarding-step>
 
                         <!-- Step 2 Card -->
                         <c-onboarding-step
-                            tasks={step2Tasks}
-                            title="Step 2: Enter Property Unit Details"
+                            tasks={steps.STEP2.tasks}
+                            title={steps.STEP2.title}
                             icon="utility:puzzle"
                             ontaskcomplete={handleTaskComplete}
                         ></c-onboarding-step>
 
                         <!-- Step 3 Card -->
                         <c-onboarding-step
-                            tasks={step3Tasks}
-                            title="Step 3: Enter Elevator Details"
+                            tasks={steps.STEP3.tasks}
+                            title={steps.STEP3.title}
                             icon="utility:up"
                             ontaskcomplete={handleTaskComplete}
                         ></c-onboarding-step>
 
                         <!-- Step 4 Card -->
                         <c-onboarding-step
-                            tasks={step4Tasks}
-                            title="Step 4: Enter Order Details"
+                            tasks={steps.STEP4.tasks}
+                            title={steps.STEP4.title}
                             icon="utility:work_order_type"
                             ontaskcomplete={handleTaskComplete}
                         ></c-onboarding-step>
@@ -53,16 +77,28 @@
             </div>
 
             <!-- Right Sidebar -->
-            <div class={rightSidebarClass}>
-                <div class="resize-handle"></div>
-                <c-onboarding-right-sidebar
-                    title={selectedTaskName}
-                    onclose={closeRightSidebar}
-                    onsave={handleSave}
-                ></c-onboarding-right-sidebar>
-            </div>
+                <div class={rightSidebarClass}>
+                    <div class="resize-handle"></div>
+                    <c-onboarding-right-sidebar
+                        if:true={isRightSidebarOpen}
+                        selected-task={selectedTask}
+                        section-names={sectionNames}
+                        onclose={closeRightSidebar}
+                        onsave={handleSave}
+                        onchange={handleDraftChange}
+                    ></c-onboarding-right-sidebar>
+                </div>
         </div>
     </div>
+
+
+    <template if:true={showToast}>
+        <c-custom-toast
+            toast={toast}
+            onhide={hideToast}>
+        </c-custom-toast>
+    </template>
+
 
     
 </template>

@@ -1,6 +1,7 @@
 import { LightningElement, api, track } from 'lwc';
 
 export default class OnboardingLeftSidebar extends LightningElement {
+    @api isLoading = false;
     @api elevators = [];
     @track searchQuery = '';
 
@@ -45,5 +46,23 @@ export default class OnboardingLeftSidebar extends LightningElement {
 
     handleUpload() {
         this.dispatchEvent(new CustomEvent('upload'));
+    }
+
+    handleTabLabelChange(event) {
+        this.dispatchEvent(new CustomEvent('change', {
+            detail: {
+                elevatorId: event.target.dataset.id,
+                value: event.target.value
+            }
+        }));
+    }
+
+    editTab(event) {
+        this.dispatchEvent(new CustomEvent('edit', {
+            detail: {
+                elevatorId: event.currentTarget.dataset.id,
+                flag: event.currentTarget.dataset.flag === 'true'
+            }
+        }));
     }
 }

@@ -1,0 +1,12 @@
+<template>
+    <div class="slds-illustration slds-illustration_small">
+        <div lwc:dom="manual" class="svg-container"></div>
+        <div class="slds-text-longform">
+            <h3 class="slds-text-heading_medium">{title}</h3>
+            <p class="slds-text-body_regular">{message}</p>
+            <template if:true={action}>
+                <button class="slds-button slds-button_brand" onclick={handleActionClick}>{action.name}</button>
+            </template>
+        </div>
+    </div>
+</template> 

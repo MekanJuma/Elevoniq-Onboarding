@@ -6,13 +6,16 @@
             <span class="or-text">Oder</span>
             <hr class="or-line" />
         </div>
-        <button class="upload-btn slds-button slds-button_neutral slds-button_stretch" onclick={handleUpload}>
+        <button 
+            class="upload-btn slds-button slds-button_neutral slds-button_stretch" 
+            onclick={handleUpload}
+            disabled={isLoading}>
             <lightning-icon icon-name="utility:upload" size="x-small" class="slds-m-right_x-small"></lightning-icon>
             <span>Datei hochladen</span>
         </button>
         <lightning-input
             type="search"
-            placeholder="Search"
+            placeholder="Suche"
             onchange={handleSearch}
             class="search-input">
         </lightning-input>
@@ -22,17 +25,66 @@
             </div>
             <template for:each={filteredElevators} for:item="tab">
                 <div key={tab.id} class={tab.className}>
-                    <lightning-icon icon-name={tab.icon} size="x-small" class="tab-icon"></lightning-icon>
-                    <span class="tab-label" data-id={tab.id} onclick={selectTab}>{tab.label}</span>
-                    <lightning-button-icon
-                        class="delete-icon slds-icon-text-error"
-                        icon-name="utility:delete"
-                        alternative-text="Delete"
-                        size="medium"
-                        variant="bare"
-                        data-id={tab.id}
-                        onclick={deleteTab}>
-                    </lightning-button-icon>
+                    <div class="tab-content">
+                        <lightning-helptext icon-name={tab.icon} content={tab.tooltip}></lightning-helptext>
+                        <template if:true={tab.isEditing}>
+                            <lightning-input 
+                                onclick={selectTab} 
+                                class="tab-label-input" 
+                                variant="label-hidden" 
+                                data-id={tab.id} 
+                                value={tab.label} 
+                                onchange={handleTabLabelChange}>
+                            </lightning-input>
+                        </template>
+                        <template if:false={tab.isEditing}>
+                            <span 
+                                onclick={selectTab} 
+                                ondblclick={editTab} 
+                                data-flag="true"
+                                class="tab-label" 
+                                data-id={tab.id}>
+                                {tab.label}
+                            </span>
+                        </template>
+                    </div>
+                    <div class="tab-actions">
+                        <template if:true={tab.isActive}>
+                            <template if:true={tab.isEditing}>
+                                <lightning-button-icon
+                                    class="cancel-edit-icon slds-icon-text-default"
+                                    icon-name="utility:close"
+                                    alternative-text="Cancel"
+                                    size="medium"
+                                    variant="bare"
+                                    data-id={tab.id}
+                                    data-flag="false"
+                                    onclick={editTab}>
+                                </lightning-button-icon>
+                            </template>
+                            <template if:false={tab.isEditing}>
+                                <lightning-button-icon
+                                    class="edit-icon slds-icon-text-default"
+                                    icon-name="utility:edit"
+                                    alternative-text="Edit"
+                                    size="medium"
+                                    variant="bare"
+                                    data-id={tab.id}
+                                    data-flag="true"
+                                    onclick={editTab}>
+                                </lightning-button-icon>
+                            </template>
+                        </template>
+                        <lightning-button-icon
+                            class="delete-icon slds-icon-text-error"
+                            icon-name="utility:delete"
+                            alternative-text="Delete"
+                            size="medium"
+                            variant="bare"
+                            data-id={tab.id}
+                            onclick={deleteTab}>
+                        </lightning-button-icon>
+                    </div>
                 </div>
             </template>
         </div>

@@ -101,3 +101,53 @@
 .form-content::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+:host {
+    --slds-accordion__summary-color-background: #f8f9fa;
+}
+
+.custom-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(22, 50, 92, 0.08), 0 1.5px 4px rgba(22, 50, 92, 0.04);
+    margin-bottom: 2rem;
+    padding: 0;
+    transition: box-shadow 0.2s;
+}
+
+.custom-section:hover {
+    box-shadow: 0 4px 16px rgba(22, 50, 92, 0.12), 0 2px 8px rgba(22, 50, 92, 0.08);
+}
+
+.custom-section-header {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem 0.75rem 1.5rem;
+    border-bottom: 1px solid #f0f2f7;
+    background: linear-gradient(90deg, #f8f9fa 60%, #eaf1fb 100%);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.custom-section-icon {
+    margin-right: 1rem;
+    --slds-c-icon-color-foreground-default: #0176d3;
+    --slds-c-icon-color-background: #eaf1fb;
+    border-radius: 50%;
+    background: #eaf1fb;
+    padding: 0.25rem;
+}
+
+.custom-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #16325c;
+    letter-spacing: 0.01em;
+}
+
+.custom-section-body {
+    padding: 1.25rem 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}

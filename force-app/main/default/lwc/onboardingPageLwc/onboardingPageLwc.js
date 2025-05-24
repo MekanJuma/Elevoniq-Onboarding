@@ -16,7 +16,9 @@ import {
     CONTACT,
 
     STEPS,
-    REQUIRED_FIELDS
+    REQUIRED_FIELDS,
+
+    LOOKUP_OBJECTS
 } from 'c/onboardingConstants';
 
 import { 
@@ -61,6 +63,9 @@ export default class OnboardingPageLwc extends LightningElement {
     @track showExistingRecordModal = false;
     @track existingRecords;
 
+    @track lookupObject = {};
+    @track isLookup = false;
+
     @track showProductAssignmentModal = false;
 
     // ✅ done
@@ -90,18 +95,42 @@ export default class OnboardingPageLwc extends LightningElement {
                     let isChanged = elevator.productAssignments?.some(a => a.isChanged);
                     task.completed = productAssigned;
                     task.className = isChanged ? 'task-item changed' : 'task-item';
+                    task.disabled = false;
                 } else if (task.id == 'order.benefitReceiver') {
                     let br = this.accounts.find(account => account.id === elevator.benefitReceiverId);
                     task.completed = br != null;
                     task.className = br?.isChanged ? 'task-item changed' : 'task-item';
+                    task.disabled = false;   
                 } else if (task.id == 'order.invoiceReceiver') {
                     let ir = this.accounts.find(account => account.id === elevator.invoiceReceiverId);
                     task.completed = ir != null;
                     task.className = ir?.isChanged ? 'task-item changed' : 'task-item';
+                    task.disabled = false;
                 } else {
                     const data = getData(task.id, elevator);
                     task.completed = data?.completed === true;
                     task.className = data?.isChanged ? 'task-item changed' : 'task-item';
+
+                    // ! TASK DEPENDENCIES
+                    const property = this.properties.find(p => p.id === elevator.propertyId);
+                    const propertyUnit = this.propertyUnits.find(p => p.id === elevator.propertyUnitId);
+                    
+                    const taskDisabledConditions = {
+                        'property.details': false,
+                        'property.propertyOwner': !property?.id,
+                        'property.assetManager': !property?.id,
+                        'propertyUnit.details': !property?.id,
+                        'propertyUnit.pm': !propertyUnit?.id,
+                        'propertyUnit.fm': !propertyUnit?.id,
+                        'propertyUnit.hv': !propertyUnit?.id,
+                        'propertyUnit.operator': !propertyUnit?.id,
+                        'onSiteContacts.propertyManager': !propertyUnit?.id,
+                        'onSiteContacts.houseKeeper': !propertyUnit?.id,
+                        'onSiteContacts.attendant': !propertyUnit?.id,
+                        'onSiteContacts.firstAider': !propertyUnit?.id
+                    };
+
+                    task.disabled = taskDisabledConditions[task.id] ?? false;
                 }
             });
         });
@@ -392,15 +421,16 @@ export default class OnboardingPageLwc extends LightningElement {
 
         this.existingRecords = formatListItems(otherList, taskId);
 
-        if (
-            (data.completed || data?.contact?.completed || otherList.length === 0) && 
-            taskId != 'property.details' && 
-            taskId != 'propertyUnit.details'
-        ) {
+        if (taskId !== 'property.details' && taskId !== 'propertyUnit.details') {
             setTimeout(() => {
                 this.openRightSidebar();
             }, 200);
+        } else if (data.completed || data?.contact?.completed || otherList.length === 0) {
+            setTimeout(() => {
+                this.openRightSidebar(); 
+            }, 200);
         } else {
+            this.lookupObject = LOOKUP_OBJECTS[taskId.split('.')[0]];
             this.showExistingRecordModal = true;
         }
     }
@@ -482,7 +512,8 @@ export default class OnboardingPageLwc extends LightningElement {
     // ✅ done
     handleDraftChange(event) {
         const { data } = event.detail;
-        const { taskId, fieldName, fieldValue } = data;
+        const { fieldName, fieldValue } = data;
+        const taskId = this.selectedTask.id;
     
         const [objectKey, subKey] = taskId.split('.');
         
@@ -501,11 +532,56 @@ export default class OnboardingPageLwc extends LightningElement {
 
     validateAndConfirmDraftChanges() {
         if (Object.keys(this.draftChanges).length > 0) {
+            console.log('draftChanges', JSON.stringify(this.draftChanges));
             const confirmCancel = window.confirm('You have unsaved changes. Are you sure you want to cancel? Changes will be lost.');
             if (!confirmCancel) {
                 return false;
             }
         }
+        if (this.draftChanges['clearAll']) {
+            const [objectKey, subKey] = this.selectedTask.id.split('.');
+
+            // ! Property
+            if (objectKey == 'property') {
+                if (subKey == 'details') {
+                    this.selectedElevator.propertyId = this.draftChanges[`propertyId`];
+                } else {
+                    let property = this.properties.find(p => p.id === this.selectedElevator.propertyId);
+                    if (property) {
+                        property[`${subKey}Id`] = this.draftChanges[`${subKey}Id`];
+                        property[`${subKey}ContactId`] = this.draftChanges[`${subKey}ContactId`];
+                    }
+                }
+            } 
+            
+            // ! Property Unit
+            else if (objectKey == 'propertyUnit') {
+                if (subKey == 'details') {
+                    this.selectedElevator.propertyUnitId = this.draftChanges[`propertyUnitId`];
+                } else {
+                    let propertyUnit = this.propertyUnits.find(pu => pu.id === this.selectedElevator.propertyUnitId);
+                    if (propertyUnit) {
+                        propertyUnit[`${subKey}Id`] =  this.draftChanges[`${subKey}Id`];
+                        propertyUnit[`${subKey}ContactId`] = this.draftChanges[`${subKey}ContactId`];
+                    }
+                }
+            }
+    
+            // ! On Site Contacts
+            else if (objectKey == 'onSiteContacts') {
+                let propertyUnit = this.propertyUnits.find(pu => pu.id === this.selectedElevator.propertyUnitId);
+                if (propertyUnit) {
+                    propertyUnit[`${subKey}Id`] = this.draftChanges[`${subKey}Id`];
+                }
+            }
+            
+            // ! Order
+            else if (objectKey == 'order') {
+                this.selectedElevator[`${subKey}Id`] = this.draftChanges[`${subKey}Id`];
+            }
+            
+        }
+
         this.draftChanges = {};
         return true;
     }
@@ -531,13 +607,14 @@ export default class OnboardingPageLwc extends LightningElement {
     handleSave() {
         const missingFields = this.validateRequiredFields();
         if (missingFields.length > 0) {
+            console.log('draftChanges', JSON.stringify(this.draftChanges));
             this.triggerToast('Missing Required Fields', `Please fill in: ${missingFields.join(', ')}`, 'error');
             return;
         }
     
         const elevator = this.selectedElevatorDetails;
-        const [object, prop] = this.selectedTask.id.split('.');
-        const draft = this.draftChanges[object]?.[prop] || {};
+        const [objectKey, subKey] = this.selectedTask.id.split('.');
+        const draft = this.draftChanges[objectKey]?.[subKey] || {};
     
         const handleAccountAndContact = (target, prop, draft) => {
             const groups = extractPrefixedFields(draft);
@@ -557,25 +634,25 @@ export default class OnboardingPageLwc extends LightningElement {
             return record;
         };
     
-        switch (object) {
+        switch (objectKey) {
             case 'property':
-                if (prop === 'details') {
+                if (subKey === 'details') {
                     handleGenericDetails(this.properties, elevator.property?.details?.id, PROPERTY, draft, 'propertyId');
                 } else {
                     const property = this.properties.find(p => p.id === elevator?.property?.details?.id);
                     if (!property) return;
-                    handleAccountAndContact(property, prop, draft);
+                    handleAccountAndContact(property, subKey, draft);
                 }
                 break;
     
             case 'propertyUnit':
-                if (prop === 'details') {
+                if (subKey === 'details') {
                     const record = handleGenericDetails(this.propertyUnits, elevator.propertyUnit?.details?.id, PROPERTY_UNIT, draft, 'propertyUnitId');
                     record.propertyId = elevator?.property?.details?.id;
                 } else {
                     const unit = this.propertyUnits.find(p => p.id === elevator?.propertyUnit?.details?.id);
                     if (!unit) return;
-                    handleAccountAndContact(unit, prop, draft);
+                    handleAccountAndContact(unit, subKey, draft);
                 }
                 break;
     
@@ -584,13 +661,13 @@ export default class OnboardingPageLwc extends LightningElement {
                 if (!unit) return;
                 const groups = extractPrefixedFields(draft);
                 if (groups.contact) {
-                    const contact = updateOrCreateAndApply(this.contacts, unit[`${prop}Id`], CONTACT, groups.contact);
-                    unit[`${prop}Id`] = contact.id;
+                    const contact = updateOrCreateAndApply(this.contacts, unit[`${subKey}Id`], CONTACT, groups.contact);
+                    unit[`${subKey}Id`] = contact.id;
                 }
                 break;
     
             case 'order':
-                if (prop === 'details') {
+                if (subKey === 'details') {
                     this.orders = this.orders.map(order => {
                         const updated = { ...order };
                         Object.entries(draft).forEach(([key, value]) => updated[key] = value);
@@ -600,8 +677,8 @@ export default class OnboardingPageLwc extends LightningElement {
                 } else {
                     const groups = extractPrefixedFields(draft);
                     if (groups.account) {
-                        const account = updateOrCreateAndApply(this.accounts, elevator[`${prop}Id`], ACCOUNT, groups.account);
-                        this.selectedElevator[`${prop}Id`] = account.id;
+                        const account = updateOrCreateAndApply(this.accounts, elevator[`${subKey}Id`], ACCOUNT, groups.account);
+                        this.selectedElevator[`${subKey}Id`] = account.id;
                     }
                 }
                 break;
@@ -611,9 +688,7 @@ export default class OnboardingPageLwc extends LightningElement {
         this.selectedTask = {};
         this.closeRightSidebar(false);
         this.triggerToast('Success', 'Changes saved successfully', 'success');
-        // console.log('save', JSON.stringify(this.selectedElevatorDetails));
     }
-    
     // ✅ done
     validateRequiredFields() {
         const elevator = this.selectedElevatorDetails;
@@ -627,7 +702,7 @@ export default class OnboardingPageLwc extends LightningElement {
     
         requiredFields.forEach(field => {
             const fieldId = field.id;
-            const [object, prop] = fieldId.split('.');
+            const [objectKey, subKey] = fieldId.split('.');
 
             if (field.isAddress) {
                 const address = draftData[fieldId] || taskData.address || {};
@@ -639,11 +714,11 @@ export default class OnboardingPageLwc extends LightningElement {
             }
 
             let value;
-            if (object === 'contact') {
+            if (objectKey === 'contact') {
                 let tempData = taskId.split('.')[0] == 'onSiteContacts' ? { contact: taskData } : taskData;
-                value = draftData?.[fieldId] ?? tempData?.[object]?.[prop];
+                value = draftData?.[fieldId] ?? tempData?.[objectKey]?.[subKey];
             } else {
-                value = draftData[fieldId] ?? taskData[prop];
+                value = draftData[fieldId] ?? taskData[subKey];
             }
             const isEmpty = value === undefined || value === null || value === '';
     
@@ -654,9 +729,87 @@ export default class OnboardingPageLwc extends LightningElement {
     
         return missingFields;
     }
+
+    // ✅ done
+    handleLookup(event) {
+        const { object } = event.detail;
+
+        this.lookupObject = LOOKUP_OBJECTS[object];
+
+        let list = object === 'account' ? this.accounts : this.contacts;
+        let currentId = object === 'account' ? this.selectedTask.data.id : this.selectedTask.data?.contact?.id;
+        let otherList = getList(list, currentId);
+        
+        this.existingRecords = formatListItems(otherList, object);
+
+        this.showExistingRecordModal = true;
+        this.isLookup = true;
+    }
     
+    handleClear() {
+        this.draftChanges = {};
+        this.draftChanges['clearAll'] = true;
+
+        const elevator = this.selectedElevatorDetails;
+        const [objectKey, subKey] = this.selectedTask.id.split('.');
+
+        // ! Property
+        if (objectKey == 'property') {
+            if (subKey == 'details') {
+                this.draftChanges[`propertyId`] = this.selectedElevator.propertyId;
+                this.selectedElevator.propertyId = null;
+            } else {
+                let property = this.properties.find(p => p.id === elevator.propertyId);
+                if (property) {
+                    this.draftChanges[`${subKey}Id`] = property[`${subKey}Id`];
+                    this.draftChanges[`${subKey}ContactId`] = property[`${subKey}ContactId`];
     
+                    property[`${subKey}Id`] = null;
+                    property[`${subKey}ContactId`] = null;
+                }
+            }
+        } 
+        
+        // ! Property Unit
+        else if (objectKey == 'propertyUnit') {
+            if (subKey == 'details') {
+                this.draftChanges[`propertyUnitId`] = this.selectedElevator.propertyUnitId;
+                this.selectedElevator.propertyUnitId = null;
+            } else {
+                let propertyUnit = this.propertyUnits.find(pu => pu.id === elevator.propertyUnitId);
+                if (propertyUnit) {
+                    this.draftChanges[`${subKey}Id`] = propertyUnit[`${subKey}Id`];
+                    this.draftChanges[`${subKey}ContactId`] = propertyUnit[`${subKey}ContactId`];
+
+                    propertyUnit[`${subKey}Id`] = null;
+                    propertyUnit[`${subKey}ContactId`] = null;
+                }
+            }
+        }
+
+        // ! On Site Contacts
+        else if (objectKey == 'onSiteContacts') {
+            let propertyUnit = this.propertyUnits.find(pu => pu.id === elevator.propertyUnitId);
+            if (propertyUnit) {
+                this.draftChanges[`${subKey}Id`] = propertyUnit[`${subKey}Id`];
+                propertyUnit[`${subKey}Id`] = null;
+            }
+        }
+        
+        // ! Order
+        else if (objectKey == 'order') {
+            this.draftChanges[`${subKey}Id`] = this.selectedElevator[`${subKey}Id`];
+            this.selectedElevator[`${subKey}Id`] = null;
+        }
+        
+        const rightSidebar = this.template.querySelector('c-onboarding-right-sidebar');
+        if (rightSidebar) {
+            rightSidebar.clearAllInputs();
+        }
+    }
     
+
+
 
 
 
@@ -685,6 +838,8 @@ export default class OnboardingPageLwc extends LightningElement {
 
     handleExistingRecordCancel() {
         this.showExistingRecordModal = false;
+        this.isLookup = false;
+        this.lookupObject = {};
     }
 
     // ✅ done
@@ -695,6 +850,31 @@ export default class OnboardingPageLwc extends LightningElement {
             this.selectedElevator.propertyId = selectedRecord.id;
         } else if (this.selectedTask.id === 'propertyUnit.details') {
             this.selectedElevator.propertyUnitId = selectedRecord.id;
+        } else {
+            const list = this.lookupObject.objectType === 'account' ? this.accounts : this.contacts;
+            const data = list.find(item => item.id === selectedRecord.id);
+
+            const rightSidebar = this.template.querySelector('c-onboarding-right-sidebar');
+            if (rightSidebar) {
+                rightSidebar.setInputValues({
+                    [`${this.lookupObject.objectType}.name`]: data.name,
+                    [`${this.lookupObject.objectType}.email`]: data.email,
+                    [`${this.lookupObject.objectType}.address`]: data.address,
+                    [`${this.lookupObject.objectType}.firstName`]: data?.firstName,
+                    [`${this.lookupObject.objectType}.lastName`]: data?.lastName,
+                    [`${this.lookupObject.objectType}.phone`]: data?.phone,
+                    [`${this.lookupObject.objectType}.title`]: data?.title
+                });
+            }
+            
+            // TODO: update the reference id of data
+            const [objectKey, subKey] = this.selectedTask.id.split('.');
+            const referenceList = objectKey == 'property' ? this.properties :
+                                objectKey == 'order' ? this.elevators : this.propertyUnits;
+            let referenceObject = referenceList.find(item => item.id === this.selectedElevator[`${objectKey}Id`]);
+            
+            let referenceKey = this.lookupObject.objectType == 'account' ? `${subKey}Id` : `${subKey}ContactId`;
+            referenceObject[referenceKey] = selectedRecord.id;
         }
 
         this.handleExistingRecordCancel();

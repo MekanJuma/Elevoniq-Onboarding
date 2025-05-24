@@ -4,6 +4,7 @@ export default class CustomModal extends LightningElement {
     @api title;
     @api iconName;
     @track searchValue = '';
+    @api isLookup = false;
 
     @api items = [];
 
@@ -40,6 +41,11 @@ export default class CustomModal extends LightningElement {
 
     handleSelect() {
         this.dispatchEvent(new CustomEvent('selectconfirm'));
+    }
+
+
+    get hasAnyData() {
+        return this.filteredItems && this.filteredItems.length > 0;
     }
 
 }

@@ -84,10 +84,13 @@
             <div class={rightSidebarClass}>
                 <div class="resize-handle"></div>
                 <c-onboarding-right-sidebar
+                    lwc:ref="rightSidebar"
                     if:true={isRightSidebarOpen}
                     selected-task={selectedTask}
+                    onlookup={handleLookup}
                     onclose={closeRightSidebar}
                     onsave={handleSave}
+                    onclear={handleClear}
                     onchange={handleDraftChange}
                 ></c-onboarding-right-sidebar>
             </div>
@@ -107,8 +110,9 @@
 
     <c-select-existing-record-modal
         if:true={showExistingRecordModal}
-        title="Select Property"
-        icon-name="utility:check"
+        title={lookupObject.title}
+        is-lookup={isLookup}
+        icon-name={lookupObject.icon}
         items={existingRecords}
         oncancel={handleExistingRecordCancel}
         oncreate={handleExistingRecordCreate}

@@ -21,19 +21,28 @@
                     class="slds-m-bottom_medium"
                 ></lightning-input>
 
-                <template for:each={filteredItems} for:item="item">
-                    <div class="card-wrapper" key={item.id}>
-                        <div class={item.className} onclick={handleCardClick} data-id={item.id}>
-                            <div class="slds-media">
-                                <div class="slds-media__figure" style="margin-right: 0.5rem;">
-                                    <lightning-icon icon-name={item.icon} size="small"></lightning-icon>
-                                </div>
-                                <div class="slds-media__body">
-                                    <h3 class="slds-text-heading_small" style="margin-bottom: 0.25rem; font-weight: 500;">{item.title}</h3>
-                                    <p class="slds-text-body_small slds-truncate">{item.description}</p>
+                <template if:true={hasAnyData}>
+                    <template for:each={filteredItems} for:item="item">
+                        <div class="card-wrapper" key={item.id}>
+                            <div class={item.className} onclick={handleCardClick} data-id={item.id}>
+                                <div class="slds-media">
+                                    <div class="slds-media__figure" style="margin-right: 0.5rem;">
+                                        <lightning-icon icon-name={item.icon} size="small"></lightning-icon>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <h3 class="slds-text-heading_small" style="margin-bottom: 0.25rem; font-weight: 500;">{item.title}</h3>
+                                        <p class="slds-text-body_small slds-truncate">{item.description}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </template>
+                </template>
+                <template if:false={hasAnyData}>
+                    <div style="display: flex; flex-direction: column;" class="slds-align_absolute-center slds-text-align_center slds-p-vertical_xx-large">
+                        <lightning-icon icon-name="utility:warning" variant="warning" size="large" class="slds-m-bottom_medium"></lightning-icon>
+                        <div class="slds-text-heading_small slds-m-bottom_x-small">No records found</div>
+                        <div class="slds-text-body_regular slds-text-color_weak">Try adjusting your search or create a new record.</div>
                     </div>
                 </template>
             </div>
@@ -48,7 +57,7 @@
                 <!-- Right side: Select + Create New -->
                 <div>
                     <lightning-button label="Select" variant="brand-outline" onclick={handleSelect} disabled={selectDisabled}></lightning-button>
-                    <lightning-button label="Create New" variant="brand" class="slds-m-left_small" onclick={handleNew}></lightning-button>
+                    <lightning-button if:false={isLookup} label="Create New" variant="brand" class="slds-m-left_small" onclick={handleNew}></lightning-button>
                 </div>
             </footer>
             

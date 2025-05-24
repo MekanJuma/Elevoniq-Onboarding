@@ -13,6 +13,66 @@ export default class OnboardingRightSidebar extends LightningElement {
     modeOfPaymentOptions = MODE_OF_PAYMENT_OPTIONS;
     paymentIntervalOptions = PAYMENT_INTERVAL_OPTIONS;
 
+
+    @api
+    setInputValues(data) {
+        console.log('incoming data', JSON.stringify(data));
+        Object.entries(data).forEach(([fieldPath, value]) => {
+            const input = this.template.querySelector(`[data-name="${fieldPath}"]`);
+            if (!input) return;
+
+            const type = input.dataset.type;
+            if (type === 'address' && typeof value === 'object') {
+                input.street = value.street || '';
+                input.city = value.city || '';
+                input.country = value.country || '';
+                input.postalCode = value.postalCode || '';
+            } else {
+                input.value = value;
+            }
+        });
+    }
+
+    @api
+    clearAllInputs() {
+        this.template.querySelectorAll('lightning-input').forEach(input => {
+            input.value = '';
+            const fieldName = input.dataset.name;
+
+            input.dispatchEvent(new CustomEvent('change', {
+                bubbles: true,
+                composed: true,
+                detail: { data: { fieldName, fieldValue: '' } }
+            }));
+        });
+
+        this.template.querySelectorAll('lightning-input-address').forEach(addressInput => {
+            addressInput.street = '';
+            addressInput.city = '';
+            addressInput.country = '';
+            addressInput.postalCode = '';
+
+            const fieldName = addressInput.dataset.name;
+
+            addressInput.dispatchEvent(new CustomEvent('change', {
+                bubbles: true,
+                composed: true,
+                detail: { 
+                    data: {
+                        fieldName, 
+                        fieldValue: {
+                            street: '',
+                            city: '',
+                            country: '',
+                            postalCode: ''
+                        }
+                    }
+                }
+            }));
+        });
+    }
+
+
     get section() {
         let section = JSON.parse(JSON.stringify(SECTIONS_MAP));
         return section[this.selectedTask.id];
@@ -62,8 +122,7 @@ export default class OnboardingRightSidebar extends LightningElement {
 
         let data = {
             fieldName: name,
-            fieldValue: value,
-            taskId: this.selectedTask.id
+            fieldValue: value
         }
 
         this.dispatchEvent(new CustomEvent('change', {
@@ -77,5 +136,16 @@ export default class OnboardingRightSidebar extends LightningElement {
 
     closeRightSidebar() {
         this.dispatchEvent(new CustomEvent('close'));
+    }
+
+    handleLookup(event) {
+        const objectType = event.currentTarget.dataset.object;
+        this.dispatchEvent(new CustomEvent('lookup', {
+            detail: { object: objectType }
+        }));
+    }
+
+    clearAll() {
+        this.dispatchEvent(new CustomEvent('clear'));
     }
 }

@@ -56,6 +56,11 @@ const getListType = (taskId) => {
         case 'order.invoiceReceiver':
             return 'account';
 
+        case 'account':
+            return 'account';
+        case 'contact':
+            return 'contact';
+
         default:
             return null;
     }

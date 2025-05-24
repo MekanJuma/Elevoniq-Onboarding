@@ -254,6 +254,32 @@ const SECTIONS_MAP = {
 
 
 
+// ! LOOKUP
+const LOOKUP_OBJECTS = {
+    account: {
+        objectType: 'account',
+        title: "Search for an Account",
+        icon: "utility:company",
+    },
+    contact: {
+        objectType: 'contact',
+        title: "Search for a Contact",
+        icon: "utility:people",
+    },
+    property: {
+        objectType: 'property',
+        title: "Search for a Property",
+        icon: "utility:home",
+    },
+    propertyUnit: {
+        objectType: 'propertyUnit',
+        title: "Search for a Property Unit",
+        icon: "utility:puzzle",
+    }
+}
+
+
+
 // ! DATA/OBJECT STRUCTURE
 const PROPERTY = {
     id: `newProperty_${generateUniqueId()}`,
@@ -383,5 +409,7 @@ export {
     STEPS,
 
     SECTIONS_MAP,
-    REQUIRED_FIELDS
+    REQUIRED_FIELDS,
+
+    LOOKUP_OBJECTS
 };

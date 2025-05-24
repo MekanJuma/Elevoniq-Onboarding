@@ -1,0 +1,46 @@
+.custom-modal-header {
+    background-color: #f3f6f9;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #d8dde6;
+    border-radius: 5px 5px 0 0;
+}
+
+.custom-scroll {
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+}
+
+.card-wrapper {
+    margin-bottom: 0.5rem;
+}
+
+.slds-card.selectable-card {
+    border-radius: 0.5rem;
+    padding: 1rem;
+    cursor: pointer;
+    background-color: #fff;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border: 1px solid #e0e0e0;
+}
+
+.slds-card.selectable-card:hover {
+    background-color: #f4f6f9;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.slds-card.selectable-card.selected-card {
+    border: 2px solid #0070d2;
+    background-color: #eaf4ff;
+}
+
+.product-code-badge {
+    background-color: #f3f2f2;
+    color: #006494;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 4px 8px;
+    border-radius: 0.25rem;
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+}

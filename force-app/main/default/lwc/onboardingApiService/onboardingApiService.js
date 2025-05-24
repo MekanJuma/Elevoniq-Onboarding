@@ -63,7 +63,7 @@ async function makeApiRequest(method, data = null, path = '', params = {}) {
     console.log('api result', JSON.stringify(result));
 
     if (!response.ok) {
-        let message = result != null && result.length > 0 ? result[0].message : 'API request failed'
+        let message = result != null ? result.message : 'API request failed'
         throw new Error(message);
     }
 
@@ -74,25 +74,17 @@ async function makeApiRequest(method, data = null, path = '', params = {}) {
  * Get all existing elevators
  * @returns {Promise<Object>}
  */
-async function getExistingElevators(params) {
+async function getOnboardingData(params) {
     const result = await makeApiRequest('GET', null, '', params);
     return result;
 }
 
 
-/**
- * Get all existing elevator
- * @returns {Promise<Object>}
- */
-async function getExistingElevator(elevatorId, params) {
-    const result = await makeApiRequest('GET', null, `/${elevatorId}`, params);
-    return result;
-}
+
 
 
 export { 
-    getExistingElevators,
-    getExistingElevator
+    getOnboardingData
 };
 
 

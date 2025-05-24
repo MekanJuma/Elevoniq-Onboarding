@@ -1,7 +1,7 @@
 import { LightningElement, api, track } from 'lwc';
 
 export default class OnboardingLeftSidebar extends LightningElement {
-    @api isLoading = false;
+    @api buttonDisabled = false;
     @api elevators = [];
     @track searchQuery = '';
 
@@ -10,7 +10,7 @@ export default class OnboardingLeftSidebar extends LightningElement {
         if (!this.searchQuery) {
             return this.elevators;
         }
-        return this.elevators.filter(elevator => elevator.label.toLowerCase().includes(this.searchQuery.toLowerCase()));
+        return this.elevators.filter(elevator => elevator.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
     }
 
     addNewTab() {

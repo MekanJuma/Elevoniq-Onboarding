@@ -1,3 +1,7 @@
+import { generateUniqueId } from 'c/onboardingUtils';
+
+
+// ! CONSTANTS
 const ELEVATOR_STATUS = {
     APPROVED: 'Approved',
     CHANGED: 'Changed',
@@ -16,61 +20,10 @@ const ERROR = {
     MESSAGE: "Please try again",
 }
 
-const STEPS = {
-    STEP1: {
-        title: 'Step 1: Property',
-        tasks: [
-            { 
-                id: 'propertyDetails.details', 
-                name: 'Property Details', 
-                className: 'task-item',
-                completed: false
-            },
-            { 
-                id: 'propertyDetails.owner', 
-                name: 'Property Owner', 
-                className: 'task-item',
-                completed: false
-            },
-            { 
-                id: 'propertyDetails.manager', 
-                name: 'Asset Manager', 
-                className: 'task-item',
-                completed: false 
-            },
-        ]
-    },
-    STEP2: {
-        title: 'Step 2: Property Unit',
-        tasks: [
-            { id: 'propertyUnitDetails.details', name: 'Property Unit Details', className: 'task-item', completed: false },
-            { id: 'propertyUnitDetails.pm', name: 'Property Management', className: 'task-item', completed: false },
-            { id: 'propertyUnitDetails.fm', name: 'Facility Management', className: 'task-item', completed: false },
-            { id: 'propertyUnitDetails.hv', name: 'HV Company', className: 'task-item', completed: false },
-            { id: 'propertyUnitDetails.operator', name: 'Operator', className: 'task-item', completed: false }
-        ]
-    },
-    STEP3: {
-        title: 'Step 3: On Site Contacts',
-        tasks: [
-            { id: 'onSiteContacts.propertyManager', name: 'Property Manager', className: 'task-item', completed: false },
-            { id: 'onSiteContacts.houseKeeper', name: 'House Keeper', className: 'task-item', completed: false },
-            { id: 'onSiteContacts.attendant', name: 'Attendant', className: 'task-item', completed: false },
-            { id: 'onSiteContacts.firstAider', name: 'First Aider', className: 'task-item', completed: false }
-        ]
-    },
-    STEP4: {
-        title: 'Step 4: Order Details',
-        tasks: [
-            { id: 'orderDetails.details', name: 'Order Details', className: 'task-item', completed: false },
-            { id: 'orderDetails.productAssignment', name: 'Product Assignment', className: 'task-item', completed: false },
-            { id: 'orderDetails.br', name: 'Benefit Receiver', className: 'task-item', completed: false },
-            { id: 'orderDetails.ir', name: 'Invoice Receiver', className: 'task-item', completed: false }
-        ]
-    }
-    
-}
 
+
+
+// ! PICKLIST OPTIONS
 const COUNTRY_OPTIONS = [
     { label: 'Germany', value: 'DE' },
     { label: 'Austria', value: 'AT' }
@@ -101,251 +54,334 @@ const MODE_OF_PAYMENT_OPTIONS = [
     { label: 'Retrospectively', value: 'Retrospectively' }
 ]
 
-const DEFAULT_CONTACT = {
-    section: 'Contact details',
-    icon: 'utility:people',
-    fields: [
-        {
-            id: 'contact.firstName',
-            name: 'First Name',
-            isText: true,
-            value: '',
-            required: true
-        },
-        {
-            id: 'contact.lastName',
-            name: 'Last Name',
-            isText: true,
-            value: '',
-            required: true
-        },
-        {
-            id: 'contact.title',
-            name: 'Title',
-            isText: true,
-            value: '',
-            required: false 
-        },
-        {
-            id: 'contact.email',
-            name: 'Email',
-            isEmail: true,
-            value: '',
-            required: false
-        },
-        {
-            id: 'contact.phone',
-            name: 'Phone',
-            isText: true,
-            value: '',
-            required: false
-        }
-    ]
+
+// ! REQUIRED FIELDS
+const PROPERTY_REQUIRED_FIELDS = [
+    {
+        id: 'address',
+        isAddress: true,
+        name: "Address - Zip Code"
+    }
+]
+
+const PROPERTY_UNIT_REQUIRED_FIELDS = [
+    {
+        id: 'address',
+        isAddress: true,
+        name: "Address - Zip Code"
+    }
+]
+
+const ACCOUNT_REQUIRED_FIELDS = [
+    {
+        id: 'account.name',
+        name: "Account Name"
+    },
+    {
+        id: 'account.address',
+        isAddress: true,
+        name: "Address - Zip Code"
+    }
+]
+
+const CONTACT_REQUIRED_FIELDS = [
+    {
+        id: 'contact.firstName',
+        name: "First Name"
+    },
+    {
+        id: 'contact.lastName',
+        name: "Last Name"
+    },
+    {
+        id: 'contact.email',
+        name: "Email"
+    }
+]
+
+const REQUIRED_FIELDS = {
+    'property.details': PROPERTY_REQUIRED_FIELDS,
+    'property.propertyOwner': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
+    'property.assetManager': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
+    'propertyUnit.details': PROPERTY_UNIT_REQUIRED_FIELDS,
+    'propertyUnit.pm': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
+    'propertyUnit.fm': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
+    'propertyUnit.hv': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
+    'propertyUnit.operator': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
+    'onSiteContacts.propertyManager': CONTACT_REQUIRED_FIELDS,
+    'onSiteContacts.houseKeeper': CONTACT_REQUIRED_FIELDS,
+    'onSiteContacts.attendant': CONTACT_REQUIRED_FIELDS,
+    'onSiteContacts.firstAider': CONTACT_REQUIRED_FIELDS,
+    'order.details': [],
+    'order.benefitReceiver': ACCOUNT_REQUIRED_FIELDS,
+    'order.invoiceReceiver': [...ACCOUNT_REQUIRED_FIELDS, { id: 'email', name: "Email" }]
 }
 
-const DEFAULT_ACCOUNT = {
-    section: 'Company details',
-    icon: 'utility:company',
-    fields: [
-        {
-            id: 'account.name',
-            name: 'Name',
-            isText: true,
-            value: '',
-            required: true
-        },
-        {
-            id: 'account.email',
-            name: 'Email',
-            isEmail: true,
-            value: '',
-            required: false
-        },
-        {
-            id: 'account.address',
-            name: 'Address',
-            isAddress: true,
-            value: {
-                street: '',
-                city: '',
-                postalCode: '',
-                country: ''
-            },
-            required: true
-        }
-    ]
-}
 
-const DEFAULT_PROPERTY_DETAILS = {
-    section: 'Property details',
-    icon: 'utility:checkin',
-    fields: [
-        {
-            id: 'address',
-            name: 'Address',
-            isAddress: true,
-            value: {
-                street: '',
-                city: '',
-                postalCode: '',
-                country: ''
-            },
-            required: true
-        },
-        {
-            id: 'businessUnit',
-            name: 'Business Unit',
-            isText: true,
-            value: '',
-            required: false
-        }
-    ]
-}
 
-const DEFAULT_PROPERTY_UNIT_DETAILS = {
-    section: 'Property unit details',
-    icon: 'utility:checkin',
-    fields: [
-        {
-            id: 'propertyType',
-            name: 'Property Type',
-            isPicklist: true,
-            value: '',
-            required: false,
-            options: PROPERTY_TYPE_OPTIONS
-        },
-        {
-            id: 'address',
-            name: 'Address',
-            isAddress: true,
-            value: {
-                street: '',
-                city: '',
-                postalCode: '',
-                country: ''
-            },
-            required: true
-        }
-    ]
-}
-
-const DEFAULT_ORDER_DETAILS = {
-    section: 'Order details',
-    icon: 'utility:check',
-    fields: [
-        {
-            id: 'orderNumber',
-            name: 'Customer Order Number',
-            isText: true,
-            value: '',
-            required: false
-        },
-        {
-            id: 'paymentInterval',
-            name: 'Payment Interval',
-            isPicklist: true,
-            value: '',
-            required: false,
-            options: PAYMENT_INTERVAL_OPTIONS
-        },
-        {
-            id: 'modeOfPayment',
-            name: 'Mode of Payment',
-            isPicklist: true,
-            value: '',
-            required: false,
-            options: MODE_OF_PAYMENT_OPTIONS
-        }
-    ]
-}
-
-const DEFAULT_PRODUCT_ASSIGNMENT = {
-    section: 'Assign the elevator to a product',
-    icon: 'utility:assignment',
-    fields: [
-        {
-            id: 'product',
-            name: 'Product',
-            isText: true,
-            value: '',
-            required: false
-        }
-    ]
-}
-
-const DEFAULT_ELEVATOR_DETAILS = {
-    propertyDetails: {
-        details: [
-            DEFAULT_PROPERTY_DETAILS
-        ],
-        owner: [
-            DEFAULT_ACCOUNT,
-            DEFAULT_CONTACT
-        ],
-        manager: [
-            DEFAULT_ACCOUNT,
-            DEFAULT_CONTACT
+// ! DATA STEPS
+const STEPS = {
+    STEP1: {
+        title: "Step 1: Property",
+        icon: "utility:home",
+        tasks: [
+            { id: 'property.details', name: "Property Details" },
+            { id: 'property.propertyOwner', name: "Property Owner" },
+            { id: 'property.assetManager', name: "Asset Manager" }
         ]
     },
-    propertyUnitDetails: {
-        details: [
-            DEFAULT_PROPERTY_UNIT_DETAILS
-        ],
-        pm: [
-            DEFAULT_ACCOUNT,
-            DEFAULT_CONTACT
-        ],
-        fm: [
-            DEFAULT_ACCOUNT,
-            DEFAULT_CONTACT
-        ],
-        hv: [
-            DEFAULT_ACCOUNT,
-            DEFAULT_CONTACT
-        ],
-        operator: [
-            DEFAULT_ACCOUNT,
-            DEFAULT_CONTACT
+    STEP2: {
+        title: "Step 2: Property Unit",
+        icon: "utility:puzzle",
+        tasks: [
+            { id: 'propertyUnit.details', name: "Property Unit Details" },
+            { id: 'propertyUnit.pm', name: "Property Management" },
+            { id: 'propertyUnit.fm', name: "Facility Management" },
+            { id: 'propertyUnit.hv', name: "Hausverwaltung" },
+            { id: 'propertyUnit.operator', name: "Operator" }
         ]
     },
-    onSiteContacts: {
-        propertyManager: [
-            DEFAULT_CONTACT
-        ],
-        houseKeeper: [
-            DEFAULT_CONTACT
-        ],
-        attendant: [
-            DEFAULT_CONTACT
-        ],
-        firstAider: [
-            DEFAULT_CONTACT
+    STEP3: {
+        title: "Step 3: On-Site Contacts",
+        icon: "utility:people",
+        tasks: [
+            { id: 'onSiteContacts.propertyManager', name: "Property Manager" },
+            { id: 'onSiteContacts.houseKeeper', name: "Housekeeper" },
+            { id: 'onSiteContacts.attendant', name: "Attendant" },
+            { id: 'onSiteContacts.firstAider', name: "First Aider" }
         ]
     },
-    orderDetails: {
-        details: [
-            DEFAULT_ORDER_DETAILS
-        ],
-        productAssignment: [
-            DEFAULT_PRODUCT_ASSIGNMENT
-        ],
-        br: [
-            DEFAULT_ACCOUNT
-        ],
-        ir: [
-            DEFAULT_ACCOUNT
+    STEP4: {
+        title: "Step 4: Order",
+        icon: "utility:money",
+        tasks: [
+            { id: 'order.details', name: "Order Details" },
+            { id: 'order.productAssignment', name: "Product Assignment" },
+            { id: 'order.benefitReceiver', name: "Benefit Receiver" },
+            { id: 'order.invoiceReceiver', name: "Invoice Receiver" }
         ]
     }
+};
+
+const SECTIONS_MAP = {
+    'property.details': {
+        isProperty: true,
+        title: "Property Details",
+        icon: "utility:checkin",
+    },
+    'property.propertyOwner': {
+        isAccount: true,
+        isContact: true,
+        title: "Property Owner",
+        icon: "utility:company",
+    },
+    'property.assetManager': {
+        isAccount: true,
+        isContact: true,
+        title: "Asset Manager",
+        icon: "utility:company",
+    },
+    'propertyUnit.details': {
+        isPropertyUnit: true,
+        title: "Property Unit Details",
+        icon: "utility:checkin",
+    },
+    'propertyUnit.pm': {
+        isAccount: true,
+        isContact: true,
+        title: "Property Management",
+        icon: "utility:company",
+    },
+    'propertyUnit.fm': {
+        isAccount: true,
+        isContact: true,
+        title: "Facility Management",
+        icon: "utility:company",
+    },
+    'propertyUnit.hv': {
+        isAccount: true,
+        isContact: true,
+        title: "Hausverwaltung",
+        icon: "utility:company",
+    },
+    'propertyUnit.operator': {
+        isAccount: true,
+        isContact: true,
+        title: "Operator",
+        icon: "utility:company",
+    },
+    'onSiteContacts.propertyManager': {
+        isContact: true,
+        title: "Property Manager",
+        icon: "utility:company",
+    },
+    'onSiteContacts.houseKeeper': {
+        isContact: true,
+        title: "Housekeeper",
+        icon: "utility:company",
+    },
+    'onSiteContacts.attendant': {
+        isContact: true,
+        title: "Attendant",
+        icon: "utility:company",
+    },
+    'onSiteContacts.firstAider': {
+        isContact: true,
+        title: "First Aider",
+        icon: "utility:company",
+    },
+    'order.details': {
+        isOrderDetails: true,
+        title: "Order Details",
+        icon: "utility:money",
+    },
+    'order.productAssignment': {
+        isProductAssignment: true,
+        title: "Product Assignment",
+        icon: "utility:assignment",
+    },
+    'order.benefitReceiver': {
+        isAccount: true,
+        title: "Benefit Receiver",
+        icon: "utility:company",
+    },
+    'order.invoiceReceiver': {
+        isAccount: true,
+        title: "Invoice Receiver",
+        icon: "utility:company",
+    }
 }
+
+
+
+// ! DATA/OBJECT STRUCTURE
+const PROPERTY = {
+    id: `newProperty_${generateUniqueId()}`,
+    businessUnit: "",
+    address: {
+        street: "",
+        city: "",
+        postalCode: "",
+        country: ""
+    },
+    propertyOwnerId: "",
+    assetManagerId: "",
+    isChanged: true,
+    completed: true,
+    isNew: true
+}
+
+const PROPERTY_UNIT = {
+    id: `newPropertyUnit_${generateUniqueId()}`,
+    propertyType: "",
+    address: {
+        street: "",
+        city: "",
+        postalCode: "",
+        country: ""
+    },
+    propertyId: "",
+    pmId: "",
+    pmContactId: "",
+    fmId: "",
+    fmContactId: "",
+    hvId: "",
+    hvContactId: "",
+    operatorId: "",
+    operatorContactId: "",
+    isChanged: false,
+    completed: false,
+    isNew: true
+}
+
+const ELEVATOR = {
+    id: `newElevator_${generateUniqueId()}`,
+    name: "New Elevator",
+    status: "New",
+    propertyUnitId: "",
+    propertyId: "",
+    benefitReceiverId: "",
+    invoiceReceiverId: "",
+    className: "tab active-tab",
+    icon: 'utility:add',
+    tooltip: 'New',
+    isChanged: true,
+    isActive: true,
+    isEditing: true,
+    isNew: true,
+}
+
+const ACCOUNT = {
+    id: `newAccount_${generateUniqueId()}`,
+    name: "",
+    email: "",
+    type: "",
+    address: {
+        street: "",
+        city: "",
+        postalCode: "",
+        country: ""
+    },
+    isChanged: false,
+    isNew: true,
+    completed: false
+}
+
+const CONTACT = {
+    id: `newContact_${generateUniqueId()}`,
+    firstName: "",
+    lastName: "",
+    title: "",
+    email: "",
+    phone: "",
+    accountId: "",
+    isChanged: false,
+    completed: false,
+    isNew: true
+}
+
+const ORDER = {
+    order: {
+        id: `newOrder_${generateUniqueId()}`,
+        modeOfPayment: "",
+        paymentInterval: "",
+        customerOrderNumber: "",
+        type: "",
+        comment: ""
+    },
+    orderItem: {
+        id: `newOrderItem_${generateUniqueId()}`,
+        product: {
+            id: `newProduct_${generateUniqueId()}`,
+            name: "",
+        }
+    }     
+}
+
+
+
+
+
 
 export { 
     ELEVATOR_STATUS,
     NO_ELEVATORS_FOUND,
     ERROR,
-    STEPS, 
+
     PROPERTY_TYPE_OPTIONS, 
     PAYMENT_INTERVAL_OPTIONS, 
     MODE_OF_PAYMENT_OPTIONS,
-    DEFAULT_ELEVATOR_DETAILS,
-    COUNTRY_OPTIONS
+    COUNTRY_OPTIONS,
+
+    ELEVATOR,
+    PROPERTY,
+    PROPERTY_UNIT,
+    ACCOUNT,
+    CONTACT,
+    ORDER,
+
+    STEPS,
+
+    SECTIONS_MAP,
+    REQUIRED_FIELDS
 };

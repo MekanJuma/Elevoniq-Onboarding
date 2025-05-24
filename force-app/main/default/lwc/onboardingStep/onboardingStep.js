@@ -4,6 +4,7 @@ export default class OnboardingStep extends LightningElement {
     @api title;
     @api icon;
     @api tasks;
+    @api step;
 
     handleTaskComplete(event) {
         const taskId = event.target.dataset.taskId;
@@ -12,7 +13,8 @@ export default class OnboardingStep extends LightningElement {
         const taskCompleteEvent = new CustomEvent('taskcomplete', {
             detail: {
                 taskId: taskId,
-                taskName: taskName
+                taskName: taskName,
+                step: this.step
             }
         });
         this.dispatchEvent(taskCompleteEvent);

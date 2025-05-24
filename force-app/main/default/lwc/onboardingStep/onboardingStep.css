@@ -60,7 +60,7 @@
     transition: background-color 0.2s ease;
 }
 
-.task-item.completed {
+.task-item.changed {
     background-color: #fdf8f2;
 }
 

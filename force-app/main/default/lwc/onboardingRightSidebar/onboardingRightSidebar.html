@@ -15,78 +15,218 @@
         <!-- Scrollable Content -->
         <div class="right-sidebar-body">
             <div class="form-content">
-                <!-- Custom Section for each section in taskData -->
-                <template for:each={selectedTask.data} for:item="task">
-                    <div key={task.section} class="custom-section">
-                        <div class="custom-section-header">
-                            <lightning-icon icon-name={task.icon} size="small" class="custom-section-icon"></lightning-icon>
-                            <span class="custom-section-title">{task.section}</span>
-                        </div>
-                        <div class="custom-section-body">
-                            <template for:each={task.fields} for:item="field">
-                                <!-- Render text input -->
-                                <template if:true={field.isText}>
-                                    <lightning-input
-                                        key={field.name}
-                                        label={field.name}
-                                        value={field.value}
-                                        name={field.name}
-                                        type="text"
-                                        data-type="text"
-                                        data-name={field.id}
-                                        onchange={handleChange}>
-                                    </lightning-input>
-                                </template>
-                                <!-- Render Email input -->
-                                <template if:true={field.isEmail}>
-                                    <lightning-input
-                                        key={field.name}
-                                        label={field.name}
-                                        value={field.value}
-                                        name={field.name}
-                                        type="email"
-                                        data-type="email"
-                                        data-name={field.id}
-                                        onchange={handleChange}>
-                                    </lightning-input>
-                                </template>
-                                <!-- Render address input -->
-                                <template if:true={field.isAddress}>
-                                    <lightning-input-address
-                                        key={field.name}
-                                        show-address-lookup
-                                        address-lookup-placeholder="Search for an address"
-                                        address-label="Address"
-                                        street-label="Street"
-                                        city-label="City"
-                                        country-label="Country"
-                                        postal-code-label="Zip Code"
-                                        street={field.value.street}
-                                        city={field.value.city}
-                                        country={field.value.country}
-                                        postal-code={field.value.postalCode}
-                                        data-type="address"
-                                        data-name={field.id}
-                                        onchange={handleChange}>
-                                    </lightning-input-address>
-                                </template>
-                                <!-- Render picklist (combobox) -->
-                                <template if:true={field.isPicklist}>
-                                    <lightning-combobox
-                                        key={field.name}
-                                        label={field.name}
-                                        value={field.value}
-                                        options={field.options}
-                                        name={field.name}
-                                        data-type="picklist"
-                                        data-name={field.id}
-                                        onchange={handleChange}>
-                                    </lightning-combobox>
-                                </template>
-                            </template>
-                        </div>
+
+                <!-- ! Property Details -->
+                <div if:true={section.isProperty} class="custom-section">
+                    <div class="custom-section-header">
+                        <lightning-icon icon-name={section.icon} size="small" class="custom-section-icon"></lightning-icon>
+                        <span class="custom-section-title">{section.title}</span>
                     </div>
-                </template>
+                    <div class="custom-section-body">
+                        <lightning-input
+                            label="Business Unit"
+                            value={selectedTask.data.businessUnit}
+                            data-name="businessUnit"
+                            data-type="text"
+                            onchange={handleChange}>
+                        </lightning-input>
+
+                        <lightning-input-address
+                            show-address-lookup
+                            address-lookup-placeholder="Search for an address"
+                            address-label="Address"
+                            street-label="Street"
+                            city-label="City"
+                            country-label="Country"
+                            postal-code-label="Zip Code"
+                            street={street}
+                            city={city}
+                            country={country}
+                            postal-code={postalCode}
+                            data-name="address"
+                            data-type="address"
+                            onchange={handleChange}>
+                        </lightning-input-address>
+                    </div>
+                </div>
+
+                <!-- ! Account -->
+                <div if:true={section.isAccount} class="custom-section">
+                    <div class="custom-section-header">
+                        <lightning-icon icon-name={section.icon} size="small" class="custom-section-icon"></lightning-icon>
+                        <span class="custom-section-title">{section.title}</span>
+                    </div>
+                    <div class="custom-section-body">
+                        <lightning-input
+                            label="Account Name"
+                            value={selectedTask.data.name}
+                            data-name="account.name"
+                            data-type="text"
+                            onchange={handleChange}>
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Email"
+                            type="email"
+                            value={selectedTask.data.email}
+                            data-name="account.email"
+                            data-type="email"
+                            onchange={handleChange}>
+                        </lightning-input>
+
+                        <lightning-input-address
+                            show-address-lookup
+                            address-lookup-placeholder="Search for an address"
+                            address-label="Address"
+                            street-label="Street"
+                            city-label="City"
+                            country-label="Country"
+                            postal-code-label="Zip Code"
+                            street={street}
+                            city={city}
+                            country={country}
+                            postal-code={postalCode}
+                            data-name="account.address"
+                            data-type="address"
+                            onchange={handleChange}>
+                        </lightning-input-address>
+                    </div>
+                </div>
+
+                <!-- ! Contact -->
+                <div if:true={section.isContact} class="custom-section">
+                    <div class="custom-section-header">
+                        <lightning-icon icon-name="utility:people" size="small" class="custom-section-icon"></lightning-icon>
+                        <span class="custom-section-title">Contact Details</span>
+                    </div>
+                    <div class="custom-section-body">
+                        <lightning-input
+                            label="First Name"
+                            value={contact.firstName}
+                            data-name="contact.firstName"
+                            data-type="text"
+                            onchange={handleChange}
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Last Name"
+                            value={contact.lastName}
+                            data-name="contact.lastName"
+                            data-type="text"
+                            onchange={handleChange}
+                            required="">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Title"
+                            value={contact.title}
+                            data-name="contact.title"
+                            data-type="text"
+                            onchange={handleChange}>
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Email"
+                            value={contact.email}
+                            data-name="contact.email"
+                            data-type="email"
+                            onchange={handleChange}
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Phone"
+                            value={contact.phone}
+                            data-name="contact.phone"
+                            data-type="phone"
+                            onchange={handleChange}>
+                        </lightning-input>
+                    </div>
+                </div>
+
+                <!-- ! Property Unit Details -->
+                <div if:true={section.isPropertyUnit} class="custom-section">
+                    <div class="custom-section-header">
+                        <lightning-icon icon-name={section.icon} size="small" class="custom-section-icon"></lightning-icon>
+                        <span class="custom-section-title">{section.title}</span>
+                    </div>
+                    <div class="custom-section-body">
+                        <lightning-combobox
+                            label="Property Type"
+                            value={selectedTask.data.propertyType}
+                            options={propertyTypeOptions}
+                            name="propertyType"
+                            data-type="picklist"
+                            data-name="propertyType"
+                            onchange={handleChange}>
+                        </lightning-combobox>
+
+                        <lightning-input-address
+                            show-address-lookup
+                            address-lookup-placeholder="Search for an address"
+                            address-label="Address"
+                            street-label="Street"
+                            city-label="City"
+                            country-label="Country"
+                            postal-code-label="Zip Code"
+                            street={street}
+                            city={city}
+                            country={country}
+                            postal-code={postalCode}
+                            data-name="address"
+                            data-type="address"
+                            onchange={handleChange}>
+                        </lightning-input-address>
+                    </div>
+                </div>
+
+                <!-- ! Order Details -->
+                <div if:true={section.isOrderDetails} class="custom-section">
+                    <div class="custom-section-header">
+                        <lightning-icon icon-name={section.icon} size="small" class="custom-section-icon"></lightning-icon>
+                        <span class="custom-section-title">{section.title}</span>
+                    </div>
+                    <div class="custom-section-body">
+                        <lightning-combobox
+                            label="Mode of Payment"
+                            value={selectedTask.data.modeOfPayment}
+                            options={modeOfPaymentOptions}
+                            name="modeOfPayment"
+                            data-type="picklist"
+                            data-name="modeOfPayment"
+                            onchange={handleChange}>
+                        </lightning-combobox>
+
+                        <lightning-combobox
+                            if:true={selectedTask.data.isRecurring}
+                            label="Payment Interval"
+                            value={selectedTask.data.paymentInterval}
+                            options={paymentIntervalOptions}
+                            name="paymentInterval"
+                            data-type="picklist"
+                            data-name="paymentInterval"
+                            onchange={handleChange}>
+                        </lightning-combobox>
+
+                        <lightning-input
+                            label="Customer Order Number"
+                            value={selectedTask.data.customerOrderNumber}
+                            data-name="customerOrderNumber"
+                            data-type="text"
+                            onchange={handleChange}>
+                        </lightning-input>
+
+                        <lightning-textarea
+                            label="Comment"
+                            value={selectedTask.data.comment}
+                            data-name="comment"
+                            data-type="textarea"
+                            onchange={handleChange}>
+                        </lightning-textarea>
+                    </div>
+                </div>
+
             </div>
         </div>
 

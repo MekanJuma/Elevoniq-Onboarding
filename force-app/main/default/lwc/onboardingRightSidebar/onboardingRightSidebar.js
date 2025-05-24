@@ -1,13 +1,52 @@
-import { LightningElement, api, track } from 'lwc';
+import { LightningElement, api } from 'lwc';
+import { 
+    SECTIONS_MAP, 
+    PROPERTY_TYPE_OPTIONS,
+    MODE_OF_PAYMENT_OPTIONS,
+    PAYMENT_INTERVAL_OPTIONS
+} from 'c/onboardingConstants';
 
 export default class OnboardingRightSidebar extends LightningElement {
     @api selectedTask;
-    @api sectionNames = [];
+
+    propertyTypeOptions = PROPERTY_TYPE_OPTIONS;
+    modeOfPaymentOptions = MODE_OF_PAYMENT_OPTIONS;
+    paymentIntervalOptions = PAYMENT_INTERVAL_OPTIONS;
+
+    get section() {
+        let section = JSON.parse(JSON.stringify(SECTIONS_MAP));
+        return section[this.selectedTask.id];
+    }
+
+
+
+
+    get street() {
+        return this.selectedTask.data?.address?.street;
+    }
+
+    get city() {
+        return this.selectedTask.data?.address?.city;
+    }
+
+    get country() {
+        return this.selectedTask.data?.address?.country;
+    }
+
+    get postalCode() {
+        return this.selectedTask.data?.address?.postalCode;
+    }
+
+
+    get contact() {
+        return this.selectedTask.data?.contact || {};
+    }
 
 
     handleChange(event) {
         const type = event.target.dataset.type;
         const name = event.target.dataset.name;
+
         let value;
 
         if (type === 'address') {
@@ -23,7 +62,6 @@ export default class OnboardingRightSidebar extends LightningElement {
 
         let data = {
             fieldName: name,
-            fieldType: type,
             fieldValue: value,
             taskId: this.selectedTask.id
         }

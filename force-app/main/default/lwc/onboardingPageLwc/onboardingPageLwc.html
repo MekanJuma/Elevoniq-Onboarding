@@ -8,7 +8,7 @@
             <!-- Left Side Bar -->
             <c-onboarding-left-sidebar
                 elevators={elevators}
-                is-loading={isLoading}
+                button-disabled={buttonDisabled}
                 onadd={addNewElevator}
                 onselect={selectElevator}
                 ondelete={deleteElevator}
@@ -45,7 +45,8 @@
                         <c-onboarding-step
                             tasks={steps.STEP1.tasks}
                             title={steps.STEP1.title}
-                            icon="utility:home"
+                            step="STEP1"
+                            icon={steps.STEP1.icon}
                             ontaskcomplete={handleTaskComplete}
                         ></c-onboarding-step>
 
@@ -53,7 +54,8 @@
                         <c-onboarding-step
                             tasks={steps.STEP2.tasks}
                             title={steps.STEP2.title}
-                            icon="utility:puzzle"
+                            step="STEP2"
+                            icon={steps.STEP2.icon}
                             ontaskcomplete={handleTaskComplete}
                         ></c-onboarding-step>
 
@@ -61,7 +63,8 @@
                         <c-onboarding-step
                             tasks={steps.STEP3.tasks}
                             title={steps.STEP3.title}
-                            icon="utility:up"
+                            step="STEP3"
+                            icon={steps.STEP3.icon}
                             ontaskcomplete={handleTaskComplete}
                         ></c-onboarding-step>
 
@@ -69,7 +72,8 @@
                         <c-onboarding-step
                             tasks={steps.STEP4.tasks}
                             title={steps.STEP4.title}
-                            icon="utility:work_order_type"
+                            step="STEP4"
+                            icon={steps.STEP4.icon}
                             ontaskcomplete={handleTaskComplete}
                         ></c-onboarding-step>
                     </div>
@@ -77,27 +81,49 @@
             </div>
 
             <!-- Right Sidebar -->
-                <div class={rightSidebarClass}>
-                    <div class="resize-handle"></div>
-                    <c-onboarding-right-sidebar
-                        if:true={isRightSidebarOpen}
-                        selected-task={selectedTask}
-                        section-names={sectionNames}
-                        onclose={closeRightSidebar}
-                        onsave={handleSave}
-                        onchange={handleDraftChange}
-                    ></c-onboarding-right-sidebar>
-                </div>
+            <div class={rightSidebarClass}>
+                <div class="resize-handle"></div>
+                <c-onboarding-right-sidebar
+                    if:true={isRightSidebarOpen}
+                    selected-task={selectedTask}
+                    onclose={closeRightSidebar}
+                    onsave={handleSave}
+                    onchange={handleDraftChange}
+                ></c-onboarding-right-sidebar>
+            </div>
         </div>
     </div>
 
 
-    <template if:true={showToast}>
-        <c-custom-toast
-            toast={toast}
-            onhide={hideToast}>
-        </c-custom-toast>
-    </template>
+
+    <c-custom-toast
+        if:true={showToast}
+        toast={toast}
+        onhide={hideToast}>
+    </c-custom-toast>
+
+
+
+
+    <c-select-existing-record-modal
+        if:true={showExistingRecordModal}
+        title="Select Property"
+        icon-name="utility:check"
+        items={existingRecords}
+        oncancel={handleExistingRecordCancel}
+        oncreate={handleExistingRecordCreate}
+        onselect={handleExistingRecordSelect}
+        onselectconfirm={handleExistingRecordSelectConfirm}
+    ></c-select-existing-record-modal>
+
+
+    <c-product-assignment-modal
+        if:true={showProductAssignmentModal}
+        items={selectedTask.data}
+        onselect={handleProductAssignmentSelect}
+        onassign={handleProductAssignment}
+        oncancel={handleProductAssignmentCancel}
+    ></c-product-assignment-modal>
 
 
     

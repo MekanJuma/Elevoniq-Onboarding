@@ -16,10 +16,10 @@
                             <span class="task-name">{task.name}</span>
                             <template if:true={task.completed}>
                                 <lightning-button 
-                                    label="Completed" 
+                                    label="View" 
                                     variant="brand-outline" 
                                     size="small"
-                                    icon-name="utility:check"
+                                    icon-name="utility:preview"
                                     icon-position="right"
                                     onclick={handleTaskComplete}
                                     data-task-id={task.id}

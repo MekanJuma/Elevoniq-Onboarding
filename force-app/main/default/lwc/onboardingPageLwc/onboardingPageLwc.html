@@ -2,12 +2,15 @@
     <div class="container">
 
         <!-- Navigation -->
-        <c-onboarding-navbar></c-onboarding-navbar>
+        <c-onboarding-navbar
+            is-any-changed={isAnyChanged}
+            onpublish={handlePublish}
+        ></c-onboarding-navbar>
 
         <div class="body-content">
             <!-- Left Side Bar -->
             <c-onboarding-left-sidebar
-                elevators={elevators}
+                elevators={filteredElevators}
                 button-disabled={buttonDisabled}
                 onadd={addNewElevator}
                 onselect={selectElevator}
@@ -130,5 +133,17 @@
     ></c-product-assignment-modal>
 
 
+    <c-delete-confirmation-modal
+        if:true={showDeleteConfirmationModal}
+        oncancel={handleDeleteConfirmationCancel}
+        ondelete={handleDeleteConfirmationDelete}
+    ></c-delete-confirmation-modal>
+
+
+    <c-upload-csv-modal
+        if:true={showUploadCsvModal}
+        oncancel={handleUploadCsvModalCancel}
+        onupload={handleUploadCsvModalUpload}
+    ></c-upload-csv-modal>
     
 </template>

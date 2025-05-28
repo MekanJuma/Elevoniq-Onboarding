@@ -68,6 +68,16 @@ export default class OnboardingPageLwc extends LightningElement {
 
     @track showProductAssignmentModal = false;
 
+    @track showDeleteConfirmationModal = false;
+    @track deleteElevatorId;
+
+    @track showUploadCsvModal = false;
+
+
+    get filteredElevators() {
+        return this.elevators.filter(elevator => elevator.status !== 'Deleted');
+    }
+
     // ✅ done
     get selectedElevator() {
         return this.elevators.find(elevator => elevator.isActive);
@@ -293,22 +303,6 @@ export default class OnboardingPageLwc extends LightningElement {
     }
 
     // ✅ done
-    deleteElevator(event) {
-        const { elevatorId } = event.detail;
-        this.elevators = this.elevators.filter(elevator => elevator.id !== elevatorId);
-
-        if (this.selectedElevator == null || (this.selectedElevator?.id === elevatorId && this.elevators.length > 0)) {
-            this.elevators[0].className = 'tab active-tab';
-            this.elevators[0].isActive = true;
-        }
-    }
-
-    // ❌ not done
-    handleUpload() {
-        console.log('upload');
-    }
-
-    // ✅ done
     editTab(event) {
         const { elevatorId, flag } = event.detail;
         this.elevators = this.elevators.map(elevator => ({
@@ -328,7 +322,74 @@ export default class OnboardingPageLwc extends LightningElement {
     }
     
 
+
+    // ! Delete Elevator
+    // ✅ done
+    deleteElevator(event) {
+        const { elevatorId } = event.detail;
+        this.showDeleteConfirmationModal = true;
+        this.deleteElevatorId = elevatorId;
+    }
+
+    handleDeleteConfirmationCancel() {
+        this.showDeleteConfirmationModal = false;
+    }
+
+    // ✅ done
+    handleDeleteConfirmationDelete() {
+        this.showDeleteConfirmationModal = false;
+
+        if (this.deleteElevatorId && this.deleteElevatorId.length === 18) {
+            this.elevators = this.elevators.map(elevator => {
+                if (elevator.id === this.deleteElevatorId) {
+                    return {
+                        ...elevator,
+                        status: 'Deleted',
+                        isActive: false,
+                        isChanged: true
+                    };
+                }
+                return elevator;
+            });
+        } else {
+            this.elevators = this.elevators.filter(elevator => elevator.id !== this.deleteElevatorId);
+        }
+
+        if (this.selectedElevator?.id === this.deleteElevatorId) {
+            const firstActiveElevator = this.elevators.find(e => e.status !== 'Deleted');
+            if (firstActiveElevator) {
+                this.elevators = this.elevators.map(elevator => ({
+                    ...elevator,
+                    className: elevator.id === firstActiveElevator.id ? 'tab active-tab' : 'tab',
+                    isActive: elevator.id === firstActiveElevator.id
+                }));
+            }
+        }
+
+        this.deleteElevatorId = null;
+    }
+
+
+
+    // ! Upload CSV
+    handleUpload() {
+        this.showUploadCsvModal = true;
+    }
+
+    handleUploadCsvModalCancel() {
+        this.showUploadCsvModal = false;
+    }
+
+    handleUploadCsvModalUpload(event) {
+        const { fileName, fileContent } = event.detail;
+        console.log('Uploaded:', fileName, fileContent);
+
+        this.showUploadCsvModal = false;
+        this.triggerToast('CSV Upload', 'This feature is not yet implemented.', 'warning');
+    }
     
+    
+
 
 
 
@@ -530,6 +591,7 @@ export default class OnboardingPageLwc extends LightningElement {
         this.draftChanges = { ...this.draftChanges };
     }
 
+    // ✅ done
     validateAndConfirmDraftChanges() {
         if (Object.keys(this.draftChanges).length > 0) {
             console.log('draftChanges', JSON.stringify(this.draftChanges));
@@ -586,23 +648,22 @@ export default class OnboardingPageLwc extends LightningElement {
         return true;
     }
 
+    get isAnyChanged() {
+        return this.elevators?.some(e => e.isChanged) || 
+               this.properties?.some(p => p.isChanged) || 
+               this.propertyUnits?.some(pu => pu.isChanged) || 
+               this.accounts?.some(a => a.isChanged) || 
+               this.contacts?.some(c => c.isChanged) || 
+               this.orders?.some(o => o.isChanged);
+    }
     // ✅ done
     handleBeforeUnload = (event) => {
-        const elevatorsChanged = this.elevators?.some(e => e.isChanged);
-        const propertiesChanged = this.properties?.some(p => p.isChanged);
-        const propertyUnitsChanged = this.propertyUnits?.some(pu => pu.isChanged);
-        const accountsChanged = this.accounts?.some(a => a.isChanged);
-        const contactsChanged = this.contacts?.some(c => c.isChanged);
-        const ordersChanged = this.orders?.some(o => o.isChanged);
-    
-        if (elevatorsChanged || propertiesChanged || propertyUnitsChanged || accountsChanged || contactsChanged || ordersChanged) {
+        if (this.isAnyChanged) {
             event.preventDefault();
             event.returnValue = '';
         }
     };
     
-    
-
     // ✅ done
     handleSave() {
         const missingFields = this.validateRequiredFields();
@@ -746,6 +807,7 @@ export default class OnboardingPageLwc extends LightningElement {
         this.isLookup = true;
     }
     
+    // ✅ done
     handleClear() {
         this.draftChanges = {};
         this.draftChanges['clearAll'] = true;
@@ -959,6 +1021,12 @@ export default class OnboardingPageLwc extends LightningElement {
 
 
 
+
+
+    // ! Publish
+    handlePublish() {
+        console.log('Publish');
+    }
 
     
 

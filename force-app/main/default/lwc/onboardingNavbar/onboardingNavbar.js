@@ -1,11 +1,18 @@
 import { LightningElement, api, track } from 'lwc';
 
 export default class OnboardingNavbar extends LightningElement {
+    @api isAnyChanged = false;
     @track userData = {
         name: 'John Doe',
         companyName: 'Hauschild Haus- & Grundstücksverwaltungsgesellschaft mbH'
     };
     @track isProfileMenuOpen = false;
+
+
+
+    get isPublishButtonDisabled() {
+        return !this.isAnyChanged;
+    }
 
     get hasUserData() {
         return this.userData && this.userData.name && this.userData.companyName;
@@ -20,6 +27,15 @@ export default class OnboardingNavbar extends LightningElement {
         }
         return '';
     }
+
+    handlePublish() {
+        this.dispatchEvent(new CustomEvent('publish'));
+    }
+
+
+
+
+
 
     handleProfileClick(event) {
         event.stopPropagation();

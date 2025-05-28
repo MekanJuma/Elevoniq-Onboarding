@@ -6,14 +6,11 @@
                 label="Publish"
                 variant="brand"
                 onclick={handlePublish}
+                disabled={isPublishButtonDisabled}
                 class="publish-button">
             </lightning-button>
             <template if:true={hasUserData}>
                 <div class="user-info" onclick={handleProfileClick}>
-                    <div class="user-details">
-                        <div class="user-name">{userData.name}</div>
-                        <!-- <div class="company-name">{userData.companyName}</div> -->
-                    </div>
                     <div class="profile-icon-container">
                         <lightning-icon 
                             icon-name="utility:user" 

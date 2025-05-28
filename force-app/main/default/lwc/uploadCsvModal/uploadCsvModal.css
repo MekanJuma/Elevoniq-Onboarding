@@ -1,0 +1,35 @@
+.custom-modal-header {
+    background-color: #f3f6f9;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #d8dde6;
+    border-radius: 5px 5px 0 0;
+}
+
+.custom-scroll {
+    padding: 1rem 1.5rem;
+}
+
+.custom-file-upload {
+    width: 100%;
+    padding: 2rem;
+    border: 2px dashed #d8dde6;
+    border-radius: 0.5rem;
+    background-color: #f4f6f9;
+    text-align: center;
+}
+
+.custom-file-upload:hover {
+    background-color: #eef1f6;
+    border-color: #7e8c9a;
+    cursor: pointer;
+}
+
+.slds-modal__content.custom-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.wide-modal {
+    max-width: 50rem;
+    width: 100%;
+}

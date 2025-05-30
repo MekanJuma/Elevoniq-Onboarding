@@ -79,6 +79,10 @@
     background-color: #eef4ff;
 }
 
+.failed-tab {
+    border-left: 4px solid rgb(234, 0, 30);
+    background-color: #fff2f2;
+}
 
 .tab-content {
     display: flex;

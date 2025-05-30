@@ -1,5 +1,9 @@
 import { LightningElement, api, track } from 'lwc';
 
+import {
+    generateUniqueId
+} from 'c/onboardingUtils';
+
 export default class OnboardingLeftSidebar extends LightningElement {
     @api buttonDisabled = false;
     @api elevators = [];
@@ -16,7 +20,7 @@ export default class OnboardingLeftSidebar extends LightningElement {
     addNewTab() {
         const newElevator = new CustomEvent('add', {
             detail: {
-                elevatorId: 'newElevator' + (this.elevators.length + 1),
+                elevatorId: 'newElevator_' + generateUniqueId(),
                 elevatorName: 'New Elevator ' + (this.elevators.length + 1)
             }
         });

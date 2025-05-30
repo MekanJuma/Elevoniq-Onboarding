@@ -73,6 +73,9 @@ export default class OnboardingPageLwc extends LightningElement {
 
     @track showUploadCsvModal = false;
 
+    @track showValidationModal = false;
+    @track validationErrors = [];
+
 
     get filteredElevators() {
         return this.elevators.filter(elevator => elevator.status !== 'Deleted');
@@ -106,20 +109,59 @@ export default class OnboardingPageLwc extends LightningElement {
                     task.completed = productAssigned;
                     task.className = isChanged ? 'task-item changed' : 'task-item';
                     task.disabled = false;
+                    
+                    let error = this.selectedError?.orderErrors?.find(e => e.field == 'productAssignments');
+                    task.isError = error != null;
+                    task.errorMessage = error?.message;
                 } else if (task.id == 'order.benefitReceiver') {
                     let br = this.accounts.find(account => account.id === elevator.benefitReceiverId);
                     task.completed = br != null;
                     task.className = br?.isChanged ? 'task-item changed' : 'task-item';
-                    task.disabled = false;   
+                    task.disabled = false;  
+                    
+                    let error = this.selectedError?.orderErrors?.find(e => e.field == 'benefitReceiverId');
+                    task.isError = error != null;
+                    task.errorMessage = error?.message;
                 } else if (task.id == 'order.invoiceReceiver') {
                     let ir = this.accounts.find(account => account.id === elevator.invoiceReceiverId);
                     task.completed = ir != null;
                     task.className = ir?.isChanged ? 'task-item changed' : 'task-item';
                     task.disabled = false;
+
+                    let error = this.selectedError?.orderErrors?.find(e => e.field == 'invoiceReceiverId');
+                    task.isError = error != null;
+                    task.errorMessage = error?.message;
                 } else {
                     const data = getData(task.id, elevator);
                     task.completed = data?.completed === true;
                     task.className = data?.isChanged ? 'task-item changed' : 'task-item';
+
+                    if (task.id == 'property.details') {
+                        let error = this.selectedError?.elevatorErrors?.find(e => e.field == 'propertyId');
+                        task.isError = error != null;
+                        task.errorMessage = error?.message;
+                    } else if (task.id == 'propertyUnit.details') {
+                        let error = this.selectedError?.elevatorErrors?.find(e => e.field == 'propertyUnitId');
+                        task.isError = error != null;
+                        task.errorMessage = error?.message;
+                    } else if (task.id == 'property.propertyOwner') {
+                        let error = this.selectedError?.propertyErrors?.find(e => e.field == 'propertyOwnerId');
+                        task.isError = error != null;
+                        task.errorMessage = error?.message;
+                    } else if (task.id == 'onSiteContacts.propertyManager') {
+                        let error = this.selectedError?.propertyUnitErrors?.find(e => e.field == 'propertyManagerId');
+                        task.isError = error != null;
+                        task.errorMessage = error?.message;
+                    } else if (task.id == 'onSiteContacts.houseKeeper') {
+                        let error = this.selectedError?.propertyUnitErrors?.find(e => e.field == 'houseKeeperId');
+                        task.isError = error != null;
+                        task.errorMessage = error?.message;
+                    } else if (task.id == 'propertyUnit.operator') {
+                        let error = this.selectedError?.propertyUnitErrors?.find(e => e.field == 'operatorId');
+                        task.isError = error != null;
+                        task.errorMessage = error?.message;
+                    }
+
 
                     // ! TASK DEPENDENCIES
                     const property = this.properties.find(p => p.id === elevator.propertyId);
@@ -215,6 +257,10 @@ export default class OnboardingPageLwc extends LightningElement {
         }
     }
 
+    get selectedError() {
+        return this.validationErrors.find(error => error.id === this.selectedElevator?.id);
+    }
+
     // ✅ done
     async connectedCallback() {
         this.parameters = this.getQueryParameters();
@@ -271,16 +317,18 @@ export default class OnboardingPageLwc extends LightningElement {
     // ✅ done
     addNewElevator(event) {
         const { elevatorId, elevatorName } = event.detail;
-
+        console.log('elevatorId', elevatorId);
         const newElevator = {
             ...JSON.parse(JSON.stringify(ELEVATOR)),
             id: elevatorId,
             name: elevatorName
         };
+
+        const failedElevatorIds = new Set(this.validationErrors.map(err => err.id));
         this.elevators = this.elevators.map(elevator => (
             { 
                 ...elevator, 
-                className: 'tab', 
+                className: failedElevatorIds.has(elevator.id) ? 'tab failed-tab' : 'tab', 
                 isActive: false 
             }
         ));
@@ -293,9 +341,12 @@ export default class OnboardingPageLwc extends LightningElement {
     // ✅ done
     selectElevator(event) {
         const { elevatorId } = event.detail;
+
+        const failedElevatorIds = new Set(this.validationErrors.map(err => err.id));
+
         this.elevators = this.elevators.map(elevator => ({
             ...elevator,
-            className: elevator.id === elevatorId ? 'tab active-tab' : 'tab',
+            className: elevator.id === elevatorId && !failedElevatorIds.has(elevator.id) ? 'tab active-tab' : failedElevatorIds.has(elevator.id) ? 'tab failed-tab' : 'tab',
             isActive: elevator.id === elevatorId
         }));
 
@@ -355,12 +406,14 @@ export default class OnboardingPageLwc extends LightningElement {
             this.elevators = this.elevators.filter(elevator => elevator.id !== this.deleteElevatorId);
         }
 
-        if (this.selectedElevator?.id === this.deleteElevatorId) {
+        if (this.selectedElevator == null || this.selectedElevator?.id === this.deleteElevatorId) {
             const firstActiveElevator = this.elevators.find(e => e.status !== 'Deleted');
+
+            const failedElevatorIds = new Set(this.validationErrors.map(err => err.id));
             if (firstActiveElevator) {
                 this.elevators = this.elevators.map(elevator => ({
                     ...elevator,
-                    className: elevator.id === firstActiveElevator.id ? 'tab active-tab' : 'tab',
+                    className: elevator.id === firstActiveElevator.id && !failedElevatorIds.has(elevator.id) ? 'tab active-tab' : failedElevatorIds.has(elevator.id) ? 'tab failed-tab' : 'tab',
                     isActive: elevator.id === firstActiveElevator.id
                 }));
             }
@@ -750,6 +803,7 @@ export default class OnboardingPageLwc extends LightningElement {
         this.closeRightSidebar(false);
         this.triggerToast('Success', 'Changes saved successfully', 'success');
     }
+
     // ✅ done
     validateRequiredFields() {
         const elevator = this.selectedElevatorDetails;
@@ -933,9 +987,11 @@ export default class OnboardingPageLwc extends LightningElement {
             const [objectKey, subKey] = this.selectedTask.id.split('.');
             const referenceList = objectKey == 'property' ? this.properties :
                                 objectKey == 'order' ? this.elevators : this.propertyUnits;
-            let referenceObject = referenceList.find(item => item.id === this.selectedElevator[`${objectKey}Id`]);
+            let refId = objectKey == 'order' ? 'id' : `${objectKey}Id`;
+            let referenceObject = referenceList.find(item => item.id === this.selectedElevator[refId]);
             
-            let referenceKey = this.lookupObject.objectType == 'account' ? `${subKey}Id` : `${subKey}ContactId`;
+            let refContactKey = objectKey == 'onSiteContacts' ? `${subKey}Id` : `${subKey}ContactId`;
+            let referenceKey = this.lookupObject.objectType == 'account' ? `${subKey}Id` : refContactKey;
             referenceObject[referenceKey] = selectedRecord.id;
         }
 
@@ -1023,12 +1079,89 @@ export default class OnboardingPageLwc extends LightningElement {
 
 
 
-    // ! Publish
-    handlePublish() {
-        console.log('Publish');
+    validateData() {
+        const errorsByElevator = [];
+
+        this.elevators.forEach(e => {
+            const errorObj = {
+                id: e.id,
+                name: e.name ?? '-',
+                elevatorErrors: [],
+                orderErrors: [],
+                propertyErrors: [],
+                propertyUnitErrors: []
+            };
+
+            // Elevator fields
+            if (!e.name) errorObj.elevatorErrors.push({ message: 'Elevator Name is missing', field: 'name' });
+            if (!e.propertyId) errorObj.elevatorErrors.push({ message: 'Elevator Property is missing', field: 'propertyId' });
+            if (!e.propertyUnitId) errorObj.elevatorErrors.push({ message: 'Elevator Property Unit is missing', field: 'propertyUnitId' });
+
+            // Order fields
+            if (!e.benefitReceiverId) errorObj.orderErrors.push({ message: 'Benefit Receiver is missing', field: 'benefitReceiverId' });
+            if (!e.invoiceReceiverId) errorObj.orderErrors.push({ message: 'Invoice Receiver is missing', field: 'invoiceReceiverId' });
+
+            // Product assignment
+            if (!e.productAssignments || e.productAssignments.length === 0) {
+                errorObj.orderErrors.push({ message: 'Product is not assigned', field: 'productAssignments' });
+            }
+
+            // Property errors — find related property
+            const property = this.properties.find(p => p.id === e.propertyId);
+            if (property) {
+                if (!property.propertyOwnerId) {
+                    errorObj.propertyErrors.push({ message: 'Property Owner is required', field: 'propertyOwnerId' });
+                }
+            }
+
+            // Property Unit errors — find related property unit
+            const propertyUnit = this.propertyUnits.find(pu => pu.id === e.propertyUnitId);
+            if (propertyUnit) {
+                if (!propertyUnit.operatorId) {
+                    errorObj.propertyUnitErrors.push({ message: 'Operator is required', field: 'operatorId' });
+                }
+                if (!propertyUnit.propertyManagerId) {
+                    errorObj.propertyUnitErrors.push({ message: 'Property Manager is required', field: 'propertyManagerId' });
+                }
+                if (!propertyUnit.houseKeeperId) {
+                    errorObj.propertyUnitErrors.push({ message: 'House Keeper is required', field: 'houseKeeperId' });
+                }
+            }
+
+            // Finally — only add elevator to result if it has any errors
+            if (
+                errorObj.elevatorErrors.length > 0 ||
+                errorObj.orderErrors.length > 0 ||
+                errorObj.propertyErrors.length > 0 ||
+                errorObj.propertyUnitErrors.length > 0
+            ) {
+                errorsByElevator.push(errorObj);
+            }
+        });
+
+        return errorsByElevator;
     }
 
+    // ! Publish
+    handlePublish() {
+        this.validationErrors = this.validateData();
     
+        this.showValidationModal = this.validationErrors.length > 0;
+    
+        const failedElevatorIds = new Set(this.validationErrors.map(err => err.id));
+    
+        this.elevators = this.elevators.map(elevator => ({
+            ...elevator,
+            className: failedElevatorIds.has(elevator.id) ? 'tab failed-tab' : this.selectedElevator.id == elevator.id ? 'tab active-tab' : 'tab'
+        }));
+    }
+    
+
+    
+    // ! Validation Modal actions
+    handleValidationModalCancel() {
+        this.showValidationModal = false;
+    }
 
 
 

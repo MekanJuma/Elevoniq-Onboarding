@@ -41,45 +41,48 @@
                         title={noElevatorsFound.TITLE}
                         message={noElevatorsFound.MESSAGE}
                     ></c-custom-validation-banner>
+                    
 
-                    <!-- Steps Grid -->
-                    <div class="steps-grid" lwc:elseif={selectedElevator}>
-                        <!-- Step 1 Card -->
-                        <c-onboarding-step
-                            tasks={steps.STEP1.tasks}
-                            title={steps.STEP1.title}
-                            step="STEP1"
-                            icon={steps.STEP1.icon}
-                            ontaskcomplete={handleTaskComplete}
-                        ></c-onboarding-step>
-
-                        <!-- Step 2 Card -->
-                        <c-onboarding-step
-                            tasks={steps.STEP2.tasks}
-                            title={steps.STEP2.title}
-                            step="STEP2"
-                            icon={steps.STEP2.icon}
-                            ontaskcomplete={handleTaskComplete}
-                        ></c-onboarding-step>
-
-                        <!-- Step 3 Card -->
-                        <c-onboarding-step
-                            tasks={steps.STEP3.tasks}
-                            title={steps.STEP3.title}
-                            step="STEP3"
-                            icon={steps.STEP3.icon}
-                            ontaskcomplete={handleTaskComplete}
-                        ></c-onboarding-step>
-
-                        <!-- Step 4 Card -->
-                        <c-onboarding-step
-                            tasks={steps.STEP4.tasks}
-                            title={steps.STEP4.title}
-                            step="STEP4"
-                            icon={steps.STEP4.icon}
-                            ontaskcomplete={handleTaskComplete}
-                        ></c-onboarding-step>
-                    </div>
+                    <template lwc:elseif={selectedElevator}>
+                        <!-- Steps Grid -->
+                        <div class="steps-grid">
+                            <!-- Step 1 Card -->
+                            <c-onboarding-step
+                                tasks={steps.STEP1.tasks}
+                                title={steps.STEP1.title}
+                                step="STEP1"
+                                icon={steps.STEP1.icon}
+                                ontaskcomplete={handleTaskComplete}
+                            ></c-onboarding-step>
+    
+                            <!-- Step 2 Card -->
+                            <c-onboarding-step
+                                tasks={steps.STEP2.tasks}
+                                title={steps.STEP2.title}
+                                step="STEP2"
+                                icon={steps.STEP2.icon}
+                                ontaskcomplete={handleTaskComplete}
+                            ></c-onboarding-step>
+    
+                            <!-- Step 3 Card -->
+                            <c-onboarding-step
+                                tasks={steps.STEP3.tasks}
+                                title={steps.STEP3.title}
+                                step="STEP3"
+                                icon={steps.STEP3.icon}
+                                ontaskcomplete={handleTaskComplete}
+                            ></c-onboarding-step>
+    
+                            <!-- Step 4 Card -->
+                            <c-onboarding-step
+                                tasks={steps.STEP4.tasks}
+                                title={steps.STEP4.title}
+                                step="STEP4"
+                                icon={steps.STEP4.icon}
+                                ontaskcomplete={handleTaskComplete}
+                            ></c-onboarding-step>
+                        </div>
+                    </template>
                 </template>
             </div>
 
@@ -145,5 +148,12 @@
         oncancel={handleUploadCsvModalCancel}
         onupload={handleUploadCsvModalUpload}
     ></c-upload-csv-modal>
+
+
+    <c-validation-modal
+        if:true={showValidationModal}
+        errors={validationErrors}
+        oncancel={handleValidationModalCancel}
+    ></c-validation-modal>
     
 </template>

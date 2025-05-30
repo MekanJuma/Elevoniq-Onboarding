@@ -1,0 +1,42 @@
+<template>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+
+            <!-- Modal Header -->
+            <header class="custom-modal-header">
+                <div class="slds-media slds-media_center">
+                    <lightning-icon icon-name="utility:warning" size="small" class="slds-m-right_small"></lightning-icon>
+                    <h2 class="slds-text-heading_medium">Validation Errors</h2>
+                </div>
+            </header>
+
+            <!-- Modal Body -->
+            <div class="slds-modal__content custom-scroll" style="max-height: 60vh;">
+                <p class="slds-m-bottom_medium">The following elevators have validation errors:</p>
+                <ul class="slds-list_dotted">
+                    <template for:each={errors} for:item="elevatorError">
+                        <li key={elevatorError.id} class="slds-m-bottom_small elevator-list-item">
+                            <lightning-icon icon-name="utility:warning" size="x-small" class="slds-m-right_x-small" alternative-text="Warning"></lightning-icon>
+                            {elevatorError.name}
+                        </li>
+                    </template>
+                </ul>
+            </div>            
+
+            <!-- Modal Footer -->
+            <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
+                <!-- Left side: Cancel -->
+                <div>
+                    <lightning-button label="Cancel" variant="neutral" onclick={handleCancel}></lightning-button>
+                </div>
+            
+                <!-- Right side:  -->
+                <div>
+                    
+                </div>
+            </footer>
+            
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

@@ -13,7 +13,10 @@
                 <template for:each={tasks} for:item="task">
                     <li key={task.id} class={task.className}>
                         <div class="task-content">
-                            <span class="task-name">{task.name}</span>
+                            <div class="task-item-content">
+                                <lightning-helptext if:true={task.isError} icon-name="utility:error" content={task.errorMessage} icon-variant="error" class="task-error"></lightning-helptext>
+                                <span class="task-name">{task.name}</span>
+                            </div>
                             <template if:true={task.completed}>
                                 <lightning-button 
                                     label="View" 

@@ -321,7 +321,6 @@ const PROPERTY_UNIT = {
 }
 
 const ELEVATOR = {
-    id: `newElevator_${generateUniqueId()}`,
     name: "New Elevator",
     status: "New",
     propertyUnitId: "",

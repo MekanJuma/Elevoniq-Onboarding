@@ -198,8 +198,9 @@ public with sharing class OnboardingController {
         public Boolean isChanged;
         public Boolean completed;
         public Boolean isNew;
+
         public PropertyUnit(String propertyUnitDetails) {
-            PropertyUnit propertyUnitObj = (PropertyUnit)JSON.deserialize(propertyUnitDetails, PropertyUnit.class);
+            PropertyUnit propertyUnitObj = (PropertyUnit) JSON.deserialize(propertyUnitDetails, PropertyUnit.class);
             this.id = propertyUnitObj.id;
             this.propertyType = propertyUnitObj.propertyType;
             this.address = propertyUnitObj.address;

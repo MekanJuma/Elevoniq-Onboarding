@@ -1,4 +1,4 @@
-public with sharing class AuthOnboarding {
+public without sharing class AuthOnboarding {
 
     public static String baseUrl = System.URL.getOrgDomainUrl().toExternalForm() + '/services/apexrest/onboarding';
     

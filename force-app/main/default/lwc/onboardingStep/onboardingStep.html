@@ -19,7 +19,7 @@
                             </div>
                             <template if:true={task.completed}>
                                 <lightning-button 
-                                    label="View" 
+                                    label="Anzeigen" 
                                     variant="brand-outline" 
                                     size="small"
                                     icon-name="utility:preview"
@@ -31,7 +31,7 @@
                             </template>
                             <template if:false={task.completed}>
                                 <lightning-button 
-                                    label="Complete" 
+                                    label="Ausfüllen" 
                                     variant="neutral" 
                                     size="small"
                                     onclick={handleTaskComplete}

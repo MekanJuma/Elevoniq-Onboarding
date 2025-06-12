@@ -24,7 +24,16 @@
                     </div>
                     <div class="custom-section-body">
                         <lightning-input
-                            label="Business Unit"
+                            label="Liegenschaftsname"
+                            value={selectedTask.data.name}
+                            data-name="name"
+                            data-type="text"
+                            onchange={handleChange}
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Wirtschaftseinheit"
                             value={selectedTask.data.businessUnit}
                             data-name="businessUnit"
                             data-type="text"
@@ -33,12 +42,12 @@
 
                         <lightning-input-address
                             show-address-lookup
-                            address-lookup-placeholder="Search for an address"
-                            address-label="Address"
-                            street-label="Street"
-                            city-label="City"
-                            country-label="Country"
-                            postal-code-label="Zip Code"
+                            address-lookup-placeholder="Suche nach einer Adresse"
+                            address-label="Adresse"
+                            street-label="Straße"
+                            city-label="Stadt"
+                            country-label="Land"
+                            postal-code-label="PLZ"
                             street={street}
                             city={city}
                             country={country}
@@ -65,7 +74,7 @@
                             <span>Lookup Account</span>
                         </button>
                         <lightning-input
-                            label="Account Name"
+                            label="Firmenname"
                             value={selectedTask.data.name}
                             data-name="account.name"
                             data-type="text"
@@ -83,12 +92,12 @@
 
                         <lightning-input-address
                             show-address-lookup
-                            address-lookup-placeholder="Search for an address"
-                            address-label="Address"
-                            street-label="Street"
-                            city-label="City"
-                            country-label="Country"
-                            postal-code-label="Zip Code"
+                            address-lookup-placeholder="Suche nach einer Adresse"
+                            address-label="Adresse"
+                            street-label="Straße"
+                            city-label="Stadt"
+                            country-label="Land"
+                            postal-code-label="PLZ"
                             street={street}
                             city={city}
                             country={country}
@@ -104,7 +113,7 @@
                 <div if:true={section.isContact} class="custom-section">
                     <div class="custom-section-header">
                         <lightning-icon icon-name="utility:people" size="small" class="custom-section-icon"></lightning-icon>
-                        <span class="custom-section-title">Contact Details</span>
+                        <span class="custom-section-title">Kontaktinformationen</span>
                     </div>
                     <div class="custom-section-body">
                         <button 
@@ -112,28 +121,37 @@
                             data-object="contact"
                             onclick={handleLookup}>
                             <lightning-icon icon-name="utility:search" size="x-small" class="slds-m-right_x-small"></lightning-icon>
-                            <span>Lookup Contact</span>
+                            <span>Kontakt auswählen</span>
                         </button>
+                        
+                        <lightning-combobox
+                            label="Anrede"
+                            value={contact.salutation}
+                            options={salutationOptions}
+                            name="salutation"
+                            data-type="picklist"
+                            data-name="salutation"
+                            onchange={handleChange}>
+                        </lightning-combobox>
+
                         <lightning-input
-                            label="First Name"
+                            label="Vorname"
                             value={contact.firstName}
                             data-name="contact.firstName"
                             data-type="text"
-                            onchange={handleChange}
-                            required>
+                            onchange={handleChange}>
                         </lightning-input>
 
                         <lightning-input
-                            label="Last Name"
+                            label="Nachname"
                             value={contact.lastName}
                             data-name="contact.lastName"
                             data-type="text"
-                            onchange={handleChange}
-                            required="">
+                            onchange={handleChange}>
                         </lightning-input>
 
                         <lightning-input
-                            label="Title"
+                            label="Berufsbezeichnung"
                             value={contact.title}
                             data-name="contact.title"
                             data-type="text"
@@ -145,8 +163,7 @@
                             value={contact.email}
                             data-name="contact.email"
                             data-type="email"
-                            onchange={handleChange}
-                            required>
+                            onchange={handleChange}>
                         </lightning-input>
 
                         <lightning-input
@@ -167,7 +184,7 @@
                     </div>
                     <div class="custom-section-body">
                         <lightning-combobox
-                            label="Property Type"
+                            label="Gebäudetyp"
                             value={selectedTask.data.propertyType}
                             options={propertyTypeOptions}
                             name="propertyType"
@@ -178,12 +195,12 @@
 
                         <lightning-input-address
                             show-address-lookup
-                            address-lookup-placeholder="Search for an address"
-                            address-label="Address"
-                            street-label="Street"
-                            city-label="City"
-                            country-label="Country"
-                            postal-code-label="Zip Code"
+                            address-lookup-placeholder="Suche nach einer Adresse"
+                            address-label="Adresse"
+                            street-label="Straße"
+                            city-label="Stadt"
+                            country-label="Land"
+                            postal-code-label="PLZ"
                             street={street}
                             city={city}
                             country={country}
@@ -203,7 +220,7 @@
                     </div>
                     <div class="custom-section-body">
                         <lightning-combobox
-                            label="Mode of Payment"
+                            label="Zahlungsmodalitäten"
                             value={selectedTask.data.modeOfPayment}
                             options={modeOfPaymentOptions}
                             name="modeOfPayment"
@@ -214,7 +231,7 @@
 
                         <lightning-combobox
                             if:true={selectedTask.data.isRecurring}
-                            label="Payment Interval"
+                            label="Zahlungsintervall"
                             value={selectedTask.data.paymentInterval}
                             options={paymentIntervalOptions}
                             name="paymentInterval"
@@ -224,7 +241,7 @@
                         </lightning-combobox>
 
                         <lightning-input
-                            label="Customer Order Number"
+                            label="Kundenauftragsnummer"
                             value={selectedTask.data.customerOrderNumber}
                             data-name="customerOrderNumber"
                             data-type="text"
@@ -232,7 +249,7 @@
                         </lightning-input>
 
                         <lightning-textarea
-                            label="Comment"
+                            label="Bemerkungen"
                             value={selectedTask.data.comment}
                             data-name="comment"
                             data-type="textarea"
@@ -248,7 +265,7 @@
         <div class="right-sidebar-footer">
             <div class="footer-left">
                 <lightning-button 
-                    label="Cancel"
+                    label="Abbrechen"
                     variant="neutral"
                     onclick={closeRightSidebar}
                     class="slds-m-right_x-small">
@@ -257,13 +274,13 @@
             <div class="footer-right">
                 <lightning-button 
                     if:false={section.isOrderDetails}
-                    label="Clear All"
+                    label="Entfernen"
                     variant="brand-outline"
                     onclick={clearAll}
                     class="slds-m-right_x-small">
                 </lightning-button>
                 <lightning-button 
-                    label="Save" 
+                    label="Speichern" 
                     variant="brand" 
                     onclick={handleSave}>
                 </lightning-button>

@@ -1,0 +1,154 @@
+<template>
+    <article class="slds-card">
+        <!-- Card Header -->
+        <div class="slds-card__header slds-grid slds-grid_align-spread slds-grid_vertical-align-center card-header">
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <span class="slds-icon_container slds-icon-utility-setup slds-m-right_x-small" title="Onboarding">
+                    <lightning-icon icon-name="utility:setup" size="small" class="slds-icon slds-icon_small"></lightning-icon>
+                </span>
+                <h2 class="slds-card__header-title slds-text-heading_small">Onboarding</h2>
+            </div>
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <lightning-combobox
+                    name="status"
+                    label=""
+                    value={selectedStatus}
+                    options={statusOptions}
+                    onchange={handleStatusChange}
+                    variant="label-hidden"
+                    class="slds-m-right_small">
+                </lightning-combobox>
+                <lightning-button
+                    label="Generate URL"
+                    variant="brand"
+                    onclick={handleGenerateUrl}>
+                </lightning-button>
+            </div>
+        </div>
+    
+        <!-- Card Body -->
+        <div class="slds-card__body slds-card__body_inner">
+            <!-- Info Line -->
+            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_medium">
+                <div>
+                    <p class="slds-text-body_small slds-text-color_weak">
+                        Total Elevators: {totalElevators} / {selectedStatus}: {currentStatusCount}
+                    </p>
+                </div>
+                <div class="search-container">
+                    <lightning-input
+                        type="search"
+                        label="Search Elevators"
+                        variant="label-hidden"
+                        placeholder="Search elevators..."
+                        value={searchTerm}
+                        onchange={handleSearch}>
+                    </lightning-input>
+                </div>
+            </div>
+
+            <!-- No Content Banner -->
+            <div class="banner" if:true={hasNoElevators}>
+                <c-custom-validation-banner
+                    illustrator="noContent-small"
+                    title="No Elevators Found"
+                ></c-custom-validation-banner>
+            </div>
+            
+            <!-- Elevator List -->
+            <div if:false={hasNoElevators} class="elevator-list">
+                <template for:each={visibleElevators} for:item="elevator">
+                    <div key={elevator.id} class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-vertical_xx-small slds-p-horizontal_small elevator-item">
+                        <div class="slds-truncate">
+                            <span class="slds-text-body_regular">{elevator.name}</span>
+                        </div>
+                        <lightning-button
+                            label="Review"
+                            variant="neutral"
+                            size="small"
+                            data-elevator-name={elevator.name}
+                            onclick={handleReview}>
+                        </lightning-button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    
+        <!-- Card Footer -->
+        <footer class="slds-card__footer slds-text-align_center">
+            <lightning-button
+                label="Show More"
+                variant="base"
+                onclick={handleShowMore}
+                disabled={showMoreDisabled}>
+            </lightning-button>
+        </footer>
+    </article>
+    
+
+    <!-- Generate URL Modal -->
+    <template if:true={isGenerateUrlModalOpen}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon
+                        icon-name="utility:close"
+                        onclick={closeGenerateUrlModal}
+                        alternative-text="close"
+                        variant="bare-inverse"
+                        class="slds-modal__close">
+                    </lightning-button-icon>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Generate URL</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <p>This is a dummy modal for Generate URL functionality. Replace this with your actual URL generation logic.</p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={closeGenerateUrlModal}>
+                    </lightning-button>
+                    <lightning-button
+                        variant="brand"
+                        label="Generate"
+                        onclick={closeGenerateUrlModal}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" onclick={handleModalBackdropClick}></div>
+    </template>
+
+    <!-- Review Modal -->
+    <template if:true={isReviewModalOpen}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon
+                        icon-name="utility:close"
+                        onclick={closeReviewModal}
+                        alternative-text="close"
+                        variant="bare-inverse"
+                        class="slds-modal__close">
+                    </lightning-button-icon>
+                    <h2 id="modal-heading-02" class="slds-modal__title slds-hyphenate">Review Elevator</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <p>This is a dummy modal for reviewing <strong>{selectedElevatorName}</strong>. Replace this with your actual review functionality.</p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={closeReviewModal}>
+                    </lightning-button>
+                    <lightning-button
+                        variant="brand"
+                        label="Save"
+                        onclick={closeReviewModal}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" onclick={handleModalBackdropClick}></div>
+    </template>
+</template>

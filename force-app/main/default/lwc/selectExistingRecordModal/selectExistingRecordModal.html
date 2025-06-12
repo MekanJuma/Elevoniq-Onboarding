@@ -14,7 +14,7 @@
             <div class="slds-modal__content custom-scroll" style="max-height: 60vh;">
                 <lightning-input
                     type="search"
-                    placeholder="Search..."
+                    placeholder="Suchen..."
                     variant="label-hidden"
                     value={searchValue}
                     onchange={handleSearchChange}
@@ -41,8 +41,8 @@
                 <template if:false={hasAnyData}>
                     <div style="display: flex; flex-direction: column;" class="slds-align_absolute-center slds-text-align_center slds-p-vertical_xx-large">
                         <lightning-icon icon-name="utility:warning" variant="warning" size="large" class="slds-m-bottom_medium"></lightning-icon>
-                        <div class="slds-text-heading_small slds-m-bottom_x-small">No records found</div>
-                        <div class="slds-text-body_regular slds-text-color_weak">Try adjusting your search or create a new record.</div>
+                        <div class="slds-text-heading_small slds-m-bottom_x-small">Keine Datensätze gefunden</div>
+                        <div class="slds-text-body_regular slds-text-color_weak">Versuchen Sie, Ihre Suche anzupassen oder einen neuen Datensatz zu erstellen.</div>
                     </div>
                 </template>
             </div>
@@ -51,13 +51,13 @@
             <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
                 <!-- Left side: Cancel -->
                 <div>
-                    <lightning-button label="Cancel" variant="neutral" onclick={handleCancel}></lightning-button>
+                    <lightning-button label="Abbrechen" variant="neutral" onclick={handleCancel}></lightning-button>
                 </div>
             
                 <!-- Right side: Select + Create New -->
                 <div>
-                    <lightning-button label="Select" variant="brand-outline" onclick={handleSelect} disabled={selectDisabled}></lightning-button>
-                    <lightning-button if:false={isLookup} label="Create New" variant="brand" class="slds-m-left_small" onclick={handleNew}></lightning-button>
+                    <lightning-button label="Auswählen" variant="brand-outline" onclick={handleSelect} disabled={selectDisabled}></lightning-button>
+                    <lightning-button if:false={isLookup} label="Erstellen" variant="brand" class="slds-m-left_small" onclick={handleNew}></lightning-button>
                 </div>
             </footer>
             

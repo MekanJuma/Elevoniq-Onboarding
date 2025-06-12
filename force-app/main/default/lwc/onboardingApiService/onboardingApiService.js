@@ -40,18 +40,30 @@ async function readAccessToken() {
     return accessToken;
 }
 
-async function makeApiRequest(method, data = null, path = '', params = {}) {
+
+/**
+ * Make a request to the onboarding API
+ * @param {string} method - The HTTP method to use
+ * @param {Object} data - The data to send in the request body
+ * @param {string} path - The path to append to the base URL
+ * @param {Object} params - The query parameters to append to the URL
+ * @param {Object} headers - The headers to send in the request
+ */
+async function makeApiRequest(method, data = null, path = '', params = {}, extraHeaders = {}) {
     const token = await readAccessToken();
 
     const query = new URLSearchParams(params).toString();
     const url = `/services/apexrest/onboarding${path}${query ? '?' + query : ''}`;
 
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        ...extraHeaders
+    };
+
     const options = {
         method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
+        headers
     };
 
     if (data && method !== 'GET') {
@@ -72,19 +84,43 @@ async function makeApiRequest(method, data = null, path = '', params = {}) {
 
 /**
  * Get all existing elevators
+ * @param {Object} extraHeaders - The headers to send in the request
  * @returns {Promise<Object>}
  */
-async function getOnboardingData(params) {
-    const result = await makeApiRequest('GET', null, '', params);
+async function getOnboardingData(extraHeaders) {
+    const result = await makeApiRequest('GET', null, '', {}, extraHeaders);
+    return result;
+}
+
+/**
+ * Publish the onboarding data
+ * @param {Object} data
+ * @param {Object} extraHeaders
+ * @returns {Promise<Object>}
+ */
+async function publishOnboardingData(data, extraHeaders) {
+    const result = await makeApiRequest('POST', data, '', {}, extraHeaders);
+    return result;
+}
+
+/**
+ * Upload CSV data
+ * @param {Object} data
+ * @param {Object} extraHeaders
+ * @returns {Promise<Object>}
+ */
+async function uploadCsvData(data, extraHeaders) {
+    const result = await makeApiRequest('POST', data, '', {}, extraHeaders);
     return result;
 }
 
 
 
 
-
 export { 
-    getOnboardingData
+    getOnboardingData,
+    publishOnboardingData,
+    uploadCsvData
 };
 
 

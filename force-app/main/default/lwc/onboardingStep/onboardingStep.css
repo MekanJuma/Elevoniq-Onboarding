@@ -85,10 +85,6 @@
     font-weight: 500;
 }
 
-.complete-button {
-    min-width: 100px;
-}
-
 .task-error {
     margin-right: 0.5rem;
 }

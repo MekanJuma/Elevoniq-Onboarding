@@ -9,7 +9,7 @@ const ELEVATOR_STATUS = {
 }
 
 const NO_ELEVATORS_FOUND = {
-    ILLUSTRATOR: 'desert',
+    ILLUSTRATOR: 'noContent',
     TITLE: 'No Elevators Found',
     MESSAGE: "It's time to add your first elevator",
 }
@@ -54,13 +54,17 @@ const MODE_OF_PAYMENT_OPTIONS = [
     { label: 'Retrospectively', value: 'Retrospectively' }
 ]
 
+const SALUTATION_OPTIONS = [
+    { label: 'Herr.', value: 'Herr.' },
+    { label: 'Frau.', value: 'Frau.' }
+]
+
 
 // ! REQUIRED FIELDS
 const PROPERTY_REQUIRED_FIELDS = [
     {
-        id: 'address',
-        isAddress: true,
-        name: "Address - Zip Code"
+        id: 'property.name',
+        name: "Property Name"
     }
 ]
 
@@ -101,11 +105,11 @@ const CONTACT_REQUIRED_FIELDS = [
 
 const REQUIRED_FIELDS = {
     'property.details': PROPERTY_REQUIRED_FIELDS,
-    'property.propertyOwner': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
-    'property.assetManager': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
+    'property.propertyOwner': [...ACCOUNT_REQUIRED_FIELDS],
+    'property.assetManager': [...ACCOUNT_REQUIRED_FIELDS],
     'propertyUnit.details': PROPERTY_UNIT_REQUIRED_FIELDS,
     'propertyUnit.pm': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
-    'propertyUnit.fm': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
+    'propertyUnit.fm': [...ACCOUNT_REQUIRED_FIELDS],
     'propertyUnit.hv': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
     'propertyUnit.operator': [...ACCOUNT_REQUIRED_FIELDS, ...CONTACT_REQUIRED_FIELDS],
     'onSiteContacts.propertyManager': CONTACT_REQUIRED_FIELDS,
@@ -114,7 +118,7 @@ const REQUIRED_FIELDS = {
     'onSiteContacts.firstAider': CONTACT_REQUIRED_FIELDS,
     'order.details': [],
     'order.benefitReceiver': ACCOUNT_REQUIRED_FIELDS,
-    'order.invoiceReceiver': [...ACCOUNT_REQUIRED_FIELDS, { id: 'email', name: "Email" }]
+    'order.invoiceReceiver': [...ACCOUNT_REQUIRED_FIELDS, { id: 'account.email', name: "Email" }]
 }
 
 
@@ -122,43 +126,43 @@ const REQUIRED_FIELDS = {
 // ! DATA STEPS
 const STEPS = {
     STEP1: {
-        title: "Step 1: Property",
+        title: "Schritt 1: Liegenschaft",
         icon: "utility:home",
         tasks: [
-            { id: 'property.details', name: "Property Details" },
-            { id: 'property.propertyOwner', name: "Property Owner" },
-            { id: 'property.assetManager', name: "Asset Manager" }
+            { id: 'property.details', name: "Liegenschaft" },
+            { id: 'property.propertyOwner', name: "Eigentümer" },
+            { id: 'property.assetManager', name: "AM Unternehmen" }
         ]
     },
     STEP2: {
-        title: "Step 2: Property Unit",
+        title: "Schritt 2: Verwaltungseinheit",
         icon: "utility:puzzle",
         tasks: [
-            { id: 'propertyUnit.details', name: "Property Unit Details" },
-            { id: 'propertyUnit.pm', name: "Property Management" },
-            { id: 'propertyUnit.fm', name: "Facility Management" },
-            { id: 'propertyUnit.hv', name: "Hausverwaltung" },
-            { id: 'propertyUnit.operator', name: "Operator" }
+            { id: 'propertyUnit.details', name: "Verwaltungseinheit" },
+            { id: 'propertyUnit.pm', name: "PM Unternehmen" },
+            { id: 'propertyUnit.fm', name: "FM Unternehmen" },
+            { id: 'propertyUnit.hv', name: "HV (Hausverwaltung)" },
+            { id: 'propertyUnit.operator', name: "Betreiber" }
         ]
     },
     STEP3: {
-        title: "Step 3: On-Site Contacts",
+        title: "Schritt 3: Vor-Ort-Kontakte",
         icon: "utility:people",
         tasks: [
-            { id: 'onSiteContacts.propertyManager', name: "Property Manager" },
-            { id: 'onSiteContacts.houseKeeper', name: "Housekeeper" },
-            { id: 'onSiteContacts.attendant', name: "Attendant" },
-            { id: 'onSiteContacts.firstAider', name: "First Aider" }
+            { id: 'onSiteContacts.propertyManager', name: "Objektbetreuer" },
+            { id: 'onSiteContacts.houseKeeper', name: "Hausmeister" },
+            { id: 'onSiteContacts.attendant', name: "Aufzugswärter" },
+            { id: 'onSiteContacts.firstAider', name: "Ersthelfer" }
         ]
     },
     STEP4: {
-        title: "Step 4: Order",
+        title: "Schritt 4: Bestellung",
         icon: "utility:money",
         tasks: [
-            { id: 'order.details', name: "Order Details" },
-            { id: 'order.productAssignment', name: "Product Assignment" },
-            { id: 'order.benefitReceiver', name: "Benefit Receiver" },
-            { id: 'order.invoiceReceiver', name: "Invoice Receiver" }
+            { id: 'order.details', name: "Bestellung" },
+            { id: 'order.productAssignment', name: "Produktzuordnung" },
+            { id: 'order.benefitReceiver', name: "Leistungsempfänger" },
+            { id: 'order.invoiceReceiver', name: "Rechnungsempfänger" }
         ]
     }
 };
@@ -258,22 +262,22 @@ const SECTIONS_MAP = {
 const LOOKUP_OBJECTS = {
     account: {
         objectType: 'account',
-        title: "Search for an Account",
+        title: "Firmen suchen",
         icon: "utility:company",
     },
     contact: {
         objectType: 'contact',
-        title: "Search for a Contact",
+        title: "Kontakt suchen",
         icon: "utility:people",
     },
     property: {
         objectType: 'property',
-        title: "Search for a Property",
+        title: "Liegenschaft suchen",
         icon: "utility:home",
     },
     propertyUnit: {
         objectType: 'propertyUnit',
-        title: "Search for a Property Unit",
+        title: "Verwaltungseinheit suchen",
         icon: "utility:puzzle",
     }
 }
@@ -321,7 +325,7 @@ const PROPERTY_UNIT = {
 }
 
 const ELEVATOR = {
-    name: "New Elevator",
+    name: "Neuer Aufzug",
     status: "New",
     propertyUnitId: "",
     propertyId: "",
@@ -329,7 +333,7 @@ const ELEVATOR = {
     invoiceReceiverId: "",
     className: "tab active-tab",
     icon: 'utility:add',
-    tooltip: 'New',
+    tooltip: 'Neu',
     isChanged: true,
     isActive: true,
     isEditing: true,
@@ -397,6 +401,7 @@ export {
     PAYMENT_INTERVAL_OPTIONS, 
     MODE_OF_PAYMENT_OPTIONS,
     COUNTRY_OPTIONS,
+    SALUTATION_OPTIONS,
 
     ELEVATOR,
     PROPERTY,

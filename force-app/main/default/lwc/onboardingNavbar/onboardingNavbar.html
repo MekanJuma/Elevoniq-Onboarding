@@ -3,7 +3,7 @@
         <div class="logo">Elevoniq: Aufzugsonboarding for KV-00000</div>
         <div class="navbar-right">
             <lightning-button 
-                label="Publish"
+                label="Veröffentlichen"
                 variant="brand"
                 onclick={handlePublish}
                 disabled={isPublishButtonDisabled}
@@ -44,13 +44,13 @@
                             size="x-small" 
                             class="dropdown-item-icon">
                         </lightning-icon>
-                        <span>Sign Out</span>
+                        <span>Abmelden</span>
                     </div>
                 </div>
             </template>
             <template if:false={hasUserData}>
                 <button class="sign-in-button" onclick={handleSignIn}>
-                    <span>Sign In</span>
+                    <span>Anmelden</span>
                 </button>
             </template>
         </div>

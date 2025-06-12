@@ -1,7 +1,10 @@
 import { LightningElement, track } from 'lwc';
+import LightningConfirm from 'lightning/confirm';
 
 import { 
-    getOnboardingData
+    getOnboardingData,
+    publishOnboardingData,
+    uploadCsvData
 } from 'c/onboardingApiService';
 
 import { 
@@ -78,7 +81,7 @@ export default class OnboardingPageLwc extends LightningElement {
 
 
     get filteredElevators() {
-        return this.elevators.filter(elevator => elevator.status !== 'Deleted');
+        return this.elevators.filter(elevator => !elevator.isDeleted);
     }
 
     // ✅ done
@@ -261,11 +264,18 @@ export default class OnboardingPageLwc extends LightningElement {
         return this.validationErrors.find(error => error.id === this.selectedElevator?.id);
     }
 
-    // ✅ done
-    async connectedCallback() {
-        this.parameters = this.getQueryParameters();
+    async fetchOnboardingData() {
         try {
             this.isLoading = true;
+
+            this.elevators = [];
+            this.properties = [];
+            this.propertyUnits = [];
+            this.accounts = [];
+            this.contacts = [];
+            this.orders = [];
+    
+            console.log('this.parameters', JSON.stringify(this.parameters));
             let onboarding = await getOnboardingData({
                 userId: this.parameters.userId,
                 contractId: this.parameters.contractId
@@ -278,6 +288,7 @@ export default class OnboardingPageLwc extends LightningElement {
                 tooltip: elevator.status === 'Submitted' ? ELEVATOR_STATUS.PENDING : ELEVATOR_STATUS.APPROVED,
                 isActive: index === 0
             }));
+
             this.properties = onboarding.data.properties;
             this.propertyUnits = onboarding.data.propertyUnits;
             this.accounts = onboarding.data.accounts;
@@ -293,7 +304,14 @@ export default class OnboardingPageLwc extends LightningElement {
         } finally {
             this.isLoading = false;
         }
-        
+    }
+
+    // ✅ done
+    async connectedCallback() {
+        this.parameters = this.getQueryParameters();
+
+        await this.fetchOnboardingData();
+
         this.applyBodyStyles();
         window.addEventListener('beforeunload', this.handleBeforeUnload);
     }
@@ -390,12 +408,13 @@ export default class OnboardingPageLwc extends LightningElement {
     handleDeleteConfirmationDelete() {
         this.showDeleteConfirmationModal = false;
 
-        if (this.deleteElevatorId && this.deleteElevatorId.length === 18) {
+        let elevatorToDelete = this.elevators.find(e => e.id === this.deleteElevatorId);
+        if (elevatorToDelete && !elevatorToDelete.isNew) {
             this.elevators = this.elevators.map(elevator => {
                 if (elevator.id === this.deleteElevatorId) {
                     return {
                         ...elevator,
-                        status: 'Deleted',
+                        isDeleted: true,
                         isActive: false,
                         isChanged: true
                     };
@@ -407,7 +426,7 @@ export default class OnboardingPageLwc extends LightningElement {
         }
 
         if (this.selectedElevator == null || this.selectedElevator?.id === this.deleteElevatorId) {
-            const firstActiveElevator = this.elevators.find(e => e.status !== 'Deleted');
+            const firstActiveElevator = this.elevators.find(e => !e.isDeleted);
 
             const failedElevatorIds = new Set(this.validationErrors.map(err => err.id));
             if (firstActiveElevator) {
@@ -433,12 +452,127 @@ export default class OnboardingPageLwc extends LightningElement {
         this.showUploadCsvModal = false;
     }
 
-    handleUploadCsvModalUpload(event) {
+    async handleUploadCsvModalUpload(event) {
         const { fileName, fileContent } = event.detail;
         console.log('Uploaded:', fileName, fileContent);
 
-        this.showUploadCsvModal = false;
-        this.triggerToast('CSV Upload', 'This feature is not yet implemented.', 'warning');
+        try {
+            const extraHeaders = {
+                userId: this.parameters.userId,
+                contractId: this.parameters.contractId,
+                mode: 'upload'
+            }
+            const result = await uploadCsvData({data: fileContent}, extraHeaders);
+            this.mergeUploadedData(result);
+
+        } catch (error) {
+            console.error('Error uploading CSV:', error);
+            this.triggerToast('Error', error.message || error.body?.message || 'Failed to upload CSV', 'error');
+        } finally {
+            this.showUploadCsvModal = false;
+        }
+    }
+
+    mergeUploadedData(result) {
+        const { elevators, properties, propertyUnits, accounts, contacts, orders } = result.data;
+            
+        let newElevatorsCount = 0;
+        let skippedElevatorsCount = 0;
+        const newElevatorIds = new Set();
+
+        // ! === Merge Elevators ===
+        for (const uploaded of elevators) {
+            const exists = this.elevators.some(e => e.name?.trim() === uploaded.name?.trim());
+            if (exists) {
+                skippedElevatorsCount++;
+            } else {
+                uploaded.isNew = true;
+                uploaded.isChanged = true;
+                uploaded.status = "New";
+                uploaded.icon = "utility:add";
+                uploaded.className = "tab";
+                uploaded.tooltip = "New";
+                uploaded.isEditing = true;
+
+                this.elevators.push(uploaded);
+                newElevatorIds.add(uploaded.id);
+                newElevatorsCount++;
+            }
+        }
+
+        // ! === Merge Order Comments ===
+        if (orders?.length && this.orders?.length) {
+            const uploadedComments = orders.map(o => o.comment).filter(Boolean).join('\n');
+            if (uploadedComments) {
+                this.orders.forEach(order => {
+                    order.comment = order.comment 
+                        ? order.comment + '\n' + uploadedComments
+                        : uploadedComments;
+                });
+            }
+        }
+
+        // ! === Merge related records only if linked to new elevators ===
+        const relatedPropertyIds = new Set();
+        const relatedPropertyUnitIds = new Set();
+        const relatedAccountIds = new Set();
+        const relatedContactIds = new Set();
+
+        elevators.forEach(e => {
+            if (newElevatorIds.has(e.id)) {
+                if (e.propertyId) relatedPropertyIds.add(e.propertyId);
+                if (e.propertyUnitId) relatedPropertyUnitIds.add(e.propertyUnitId);
+                if (e.invoiceReceiverId) relatedAccountIds.add(e.invoiceReceiverId);
+                if (e.benefitReceiverId) relatedAccountIds.add(e.benefitReceiverId);
+            }
+        });
+
+        propertyUnits.forEach(pu => {
+            if (
+                relatedPropertyUnitIds.has(pu.id) &&
+                !this.propertyUnits.some(existing => existing.id === pu.id)
+            ) {
+                this.propertyUnits.push(pu);
+                if (pu.operatorId) relatedAccountIds.add(pu.operatorId);
+                if (pu.propertyManagerId) relatedContactIds.add(pu.propertyManagerId);
+                if (pu.houseKeeperId) relatedContactIds.add(pu.houseKeeperId);
+            }
+        });
+
+        properties.forEach(p => {
+            if (
+                relatedPropertyIds.has(p.id) &&
+                !this.properties.some(existing => existing.id === p.id)
+            ) {
+                this.properties.push(p);
+            }
+        });
+
+        accounts.forEach(acc => {
+            if (
+                relatedAccountIds.has(acc.id) &&
+                !this.accounts.some(existing => existing.id === acc.id)
+            ) {
+                this.accounts.push(acc);
+            }
+        });
+
+        contacts.forEach(c => {
+            if (
+                relatedContactIds.has(c.id) &&
+                !this.contacts.some(existing => existing.id === c.id)
+            ) {
+                this.contacts.push(c);
+            }
+        });
+
+        // ! === Toast modal summary ===
+        const total = newElevatorsCount + skippedElevatorsCount;
+        this.triggerToast(
+            'Upload Complete',
+            `${total} elevators processed: ${newElevatorsCount} uploaded, ${skippedElevatorsCount} skipped due to duplication.`,
+            'success'
+        );
     }
     
     
@@ -648,7 +782,7 @@ export default class OnboardingPageLwc extends LightningElement {
     validateAndConfirmDraftChanges() {
         if (Object.keys(this.draftChanges).length > 0) {
             console.log('draftChanges', JSON.stringify(this.draftChanges));
-            const confirmCancel = window.confirm('You have unsaved changes. Are you sure you want to cancel? Changes will be lost.');
+            const confirmCancel = window.confirm('Sie haben ungespeicherte Änderungen. Sind Sie sicher, dass Sie abbrechen möchten? Änderungen werden verlorengehen.');
             if (!confirmCancel) {
                 return false;
             }
@@ -726,6 +860,7 @@ export default class OnboardingPageLwc extends LightningElement {
             return;
         }
     
+        console.log('darftchanges: ', JSON.stringify(this.draftChanges));
         const elevator = this.selectedElevatorDetails;
         const [objectKey, subKey] = this.selectedTask.id.split('.');
         const draft = this.draftChanges[objectKey]?.[subKey] || {};
@@ -790,6 +925,7 @@ export default class OnboardingPageLwc extends LightningElement {
                     });
                 } else {
                     const groups = extractPrefixedFields(draft);
+                    console.log('groups: ', JSON.stringify(groups));
                     if (groups.account) {
                         const account = updateOrCreateAndApply(this.accounts, elevator[`${subKey}Id`], ACCOUNT, groups.account);
                         this.selectedElevator[`${subKey}Id`] = account.id;
@@ -801,6 +937,7 @@ export default class OnboardingPageLwc extends LightningElement {
         this.draftChanges = {};
         this.selectedTask = {};
         this.closeRightSidebar(false);
+
         this.triggerToast('Success', 'Changes saved successfully', 'success');
     }
 
@@ -832,9 +969,12 @@ export default class OnboardingPageLwc extends LightningElement {
             if (objectKey === 'contact') {
                 let tempData = taskId.split('.')[0] == 'onSiteContacts' ? { contact: taskData } : taskData;
                 value = draftData?.[fieldId] ?? tempData?.[objectKey]?.[subKey];
+            } else if (objectKey === 'property') {
+                value = draftData?.[subKey] ?? taskData?.[subKey];
             } else {
                 value = draftData[fieldId] ?? taskData[subKey];
             }
+            console.log('value', value);
             const isEmpty = value === undefined || value === null || value === '';
     
             if (isEmpty) {
@@ -1077,7 +1217,58 @@ export default class OnboardingPageLwc extends LightningElement {
 
 
 
+    // ✅ done
+    prepareFinalData() {
+        const elevatorPropertyIds = new Set(this.elevators.map(e => e.propertyId));
+        const elevatorPropertyUnitIds = new Set(this.elevators.map(e => e.propertyUnitId));
 
+        const properties = this.properties.filter(p => elevatorPropertyIds.has(p.id) && p.isChanged);
+        const propertyUnits = this.propertyUnits.filter(pu => elevatorPropertyUnitIds.has(pu.id) && pu.isChanged);
+        
+        // ! Account IDs
+        const accountIds = new Set();
+        this.elevators.forEach(e => {
+            accountIds.add(e.benefitReceiverId);
+            accountIds.add(e.invoiceReceiverId);
+        });
+        properties.forEach(p => {
+            accountIds.add(p.propertyOwnerId);
+            accountIds.add(p.assetManagerId);
+        });
+        propertyUnits.forEach(pu => {
+            accountIds.add(pu.pmId);
+            accountIds.add(pu.fmId);
+            accountIds.add(pu.hvId);
+            accountIds.add(pu.operatorId);
+        });
+
+        // ! Contact IDs
+        const contactIds = new Set();
+        properties.forEach(p => {
+            contactIds.add(p.propertyOwnerContactId);
+            contactIds.add(p.assetManagerContactId);
+        });
+        propertyUnits.forEach(pu => {
+            contactIds.add(pu.pmContactId);
+            contactIds.add(pu.fmContactId);
+            contactIds.add(pu.hvContactId);
+            contactIds.add(pu.operatorContactId);
+            contactIds.add(pu.propertyManagerId);
+            contactIds.add(pu.houseKeeperId);
+            contactIds.add(pu.attendantId);
+            contactIds.add(pu.firstAiderId);
+        });
+
+        const accounts = this.accounts.filter(a => accountIds.has(a.id) && a.isChanged);
+        const contacts = this.contacts.filter(c => contactIds.has(c.id) && c.isChanged);
+
+        return {
+            accounts,
+            contacts,
+            properties,
+            propertyUnits
+        }
+    }
 
     validateData() {
         const errorsByElevator = [];
@@ -1108,11 +1299,11 @@ export default class OnboardingPageLwc extends LightningElement {
 
             // Property errors — find related property
             const property = this.properties.find(p => p.id === e.propertyId);
-            if (property) {
-                if (!property.propertyOwnerId) {
-                    errorObj.propertyErrors.push({ message: 'Property Owner is required', field: 'propertyOwnerId' });
-                }
-            }
+            // if (property) {
+            //     if (!property.propertyOwnerId) {
+            //         errorObj.propertyErrors.push({ message: 'Property Owner is required', field: 'propertyOwnerId' });
+            //     }
+            // }
 
             // Property Unit errors — find related property unit
             const propertyUnit = this.propertyUnits.find(pu => pu.id === e.propertyUnitId);
@@ -1143,7 +1334,8 @@ export default class OnboardingPageLwc extends LightningElement {
     }
 
     // ! Publish
-    handlePublish() {
+    async handlePublish() {
+        this.isLoading = true;
         this.validationErrors = this.validateData();
     
         this.showValidationModal = this.validationErrors.length > 0;
@@ -1154,6 +1346,31 @@ export default class OnboardingPageLwc extends LightningElement {
             ...elevator,
             className: failedElevatorIds.has(elevator.id) ? 'tab failed-tab' : this.selectedElevator.id == elevator.id ? 'tab active-tab' : 'tab'
         }));
+
+        if (this.validationErrors.length == 0) {
+            try {
+                const data = {
+                    elevators: this.elevators.filter(e => e.isChanged),
+                    orders: this.orders.filter(o => o.isChanged),
+                    ...this.prepareFinalData()
+                }
+                const extraHeaders = {
+                    userId: this.parameters.userId,
+                    contractId: this.parameters.contractId
+                }
+                console.log('data', JSON.stringify(data));
+                const result = await publishOnboardingData(data, extraHeaders);
+                console.log('result', result);
+                this.triggerToast('Success', 'Data published successfully', 'success');
+                this.fetchOnboardingData();
+            } catch (error) {
+                this.isLoading = false;
+                console.error('Error publishing data', error);
+                this.triggerToast('Error', error.message || error.body?.message || 'Failed to publish data', 'error');
+            }
+        } else {
+            this.isLoading = false;
+        }
     }
     
 

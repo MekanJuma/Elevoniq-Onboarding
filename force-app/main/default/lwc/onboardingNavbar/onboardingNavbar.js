@@ -2,10 +2,8 @@ import { LightningElement, api, track } from 'lwc';
 
 export default class OnboardingNavbar extends LightningElement {
     @api isAnyChanged = false;
-    @track userData = {
-        name: 'John Doe',
-        companyName: 'Hauschild Haus- & Grundstücksverwaltungsgesellschaft mbH'
-    };
+    @api userData = {};
+    @api contractName;
     @track isProfileMenuOpen = false;
 
 
@@ -15,12 +13,12 @@ export default class OnboardingNavbar extends LightningElement {
     }
 
     get hasUserData() {
-        return this.userData && this.userData.name && this.userData.companyName;
+        return this.userData && this.userData.userName && this.userData.companyName;
     }
 
     get userInitials() {
-        if (this.userData.name) {
-            return this.userData.name.split(' ')
+        if (this.userData.userName) {
+            return this.userData.userName.split(' ')
                 .map(word => word[0])
                 .join('')
                 .toUpperCase();
@@ -71,4 +69,4 @@ export default class OnboardingNavbar extends LightningElement {
     disconnectedCallback() {
         window.removeEventListener('click', this.handleClickOutside.bind(this));
     }
-} 
+}

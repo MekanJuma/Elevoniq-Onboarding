@@ -72,7 +72,7 @@ async function makeApiRequest(method, data = null, path = '', params = {}, extra
 
     const response = await fetch(url, options);
     const result = await response.json();
-    console.log('api result', JSON.stringify(result));
+    console.log('api result', result);
 
     if (!response.ok) {
         let message = result != null ? result.message : 'API request failed'
@@ -114,16 +114,21 @@ async function uploadCsvData(data, extraHeaders) {
     return result;
 }
 
+/**
+ * Get user info
+ * @param {Object} extraHeaders
+ * @returns {Promise<Object>}
+ */
+async function getUserInfo(extraHeaders) {
+    const result = await makeApiRequest('GET', null, '', {}, extraHeaders);
+    return result;
+}
 
 
 
 export { 
     getOnboardingData,
     publishOnboardingData,
-    uploadCsvData
+    uploadCsvData,
+    getUserInfo
 };
-
-
-
-
-

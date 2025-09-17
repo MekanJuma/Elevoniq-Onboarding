@@ -3,8 +3,11 @@
 
         <!-- Navigation -->
         <c-onboarding-navbar
+            user-data={userData}
+            contract-name={contractName}
             is-any-changed={isAnyChanged}
             onpublish={handlePublish}
+            onsignout={handleSignOut}
         ></c-onboarding-navbar>
 
         <div class="body-content">

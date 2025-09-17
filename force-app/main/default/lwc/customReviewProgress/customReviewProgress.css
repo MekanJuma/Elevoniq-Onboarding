@@ -1,0 +1,30 @@
+.step-pill-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex-direction: column;
+}
+
+.step-pill {
+    width: 100%;
+    border-radius: 2rem;
+    background-color: #f3f2f2;
+    border: 1px solid #d8dde6;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.step-pill:hover {
+    background-color: #e5f3ff;
+}
+
+.step-pill.active {
+    background-color: #1b96ff;
+    color: white;
+    font-weight: 600;
+    border-color: #1b96ff;
+}

@@ -1,0 +1,158 @@
+<template>
+    <div class="content-area">
+        <div class="tab-content active" id="overview">
+            <div class="overview-content">
+                <div class="cards-grid">
+                    <!-- ! Card 1: Property -->
+                    <template for:each={preparedOverviewData} for:item="item">
+                        <div class={item.class} key={item.title}>
+                            <!-- ! Card Header -->
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class={item.iClass}>
+                                        <lightning-icon
+                                            icon-name={item.icon.iconName} size={item.icon.size}
+                                            class={item.icon.class}
+                                            alternative-text={item.title}>
+                                        </lightning-icon>
+                                    </i>
+                                    {item.title}
+                                </h3>
+                            </div>
+                            <!-- ! Card Body -->
+                            <div class="card-body">
+                                <template for:each={item.list} for:item="row">
+                                    <div key={row.title} class="info-row">
+                                        <div class="info-icon">
+                                            <lightning-icon icon-name={row.icon.name}
+                                                size={row.icon.size} class={row.icon.class}
+                                                variant={row.icon.variant}
+                                                alternative-text={row.title}>
+                                            </lightning-icon>
+                                        </div>
+                                        <div class="info-content">
+                                            <div class="info-title">{row.title}</div>
+                                            <div class="info-details">
+                                                <template for:each={row.values} for:item="val">
+                                                    <span key={val.id}
+                                                        class={val.class}>{val.name}</span><br
+                                                        key={val.id}>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                    
+
+                    <!-- ! Card 2: Property Unit -->
+                    <!-- <div class="card unit">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-home"><lightning-icon
+                                        icon-name="utility:home" size="x-small"
+                                        class="white-icon"
+                                        alternative-text="Property Unit">
+                                    </lightning-icon></i>
+                                Property Unit
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <template for:each={propertyUnitList} for:item="row">
+                                <div key={row.title} class="info-row">
+                                    <div class="info-icon">
+                                        <lightning-icon icon-name={row.icon.iconName}
+                                            size={row.icon.size} class={row.icon.class}
+                                            variant={row.icon.variant}
+                                            alternative-text={row.title}>
+                                        </lightning-icon>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-title">{row.title}</div>
+                                        <div class="info-details">
+                                            <template for:each={row.values} for:item="val">
+                                                <span key={val.id}
+                                                    class={val.class}>{val.name}</span><br
+                                                    key={val.id}>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div> -->
+
+                    <!-- ! Card 3: On Site Contacts -->
+                    <!-- <div class="card contacts">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-users">
+                                    <lightning-icon icon-name="standard:groups"
+                                        alternative-text="groups" class="group-icon"
+                                        size="small" title="groups"></lightning-icon></i>
+                                On Site Contacts
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <template for:each={onSiteContactsList} for:item="c">
+                                <div key={c.id} class="info-row">
+                                    <div class="info-icon">
+                                        <lightning-icon icon-name={c.icon.iconName}
+                                            alternative-text={c.title} class={c.icon.class}
+                                            size={c.icon.size} title={c.title}></lightning-icon>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-title">{c.maintitle}</div>
+                                        <div class="info-details">
+                                            <span class="highlight">{c.fullName}</span><br>
+                                            <span>{c.title} • {c.email}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div> -->
+
+                    <!-- ! Card 4: Order -->
+                    <!-- <div class="card order">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-clipboard-list">
+                                    <lightning-icon icon-name="action:record"
+                                        alternative-text="record" class="order-icon"
+                                        size="x-small" title="record">
+                                    </lightning-icon></i>
+                                Order
+                            </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <template for:each={orderInfoList} for:item="item">
+                                <div key={item.id} class="info-row">
+                                    <div class="info-icon">
+                                        <lightning-icon icon-name={item.icon}
+                                            alternative-text={item.label} class={item.iconClass}
+                                            size="x-small" title={item.label}>
+                                        </lightning-icon>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-title">{item.label}</div>
+                                        <div class="info-details">
+                                            <span class="highlight">{item.value1}</span><br>
+                                            <span>{item.value2}</span>
+                                            <template if:true={item.value3}>
+                                                <br><span>{item.value3}</span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

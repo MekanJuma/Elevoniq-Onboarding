@@ -1,6 +1,6 @@
 <template>
     <div class="navbar">
-        <div class="logo">Elevoniq: Aufzugsonboarding for KV-00000</div>
+        <div class="logo">Elevoniq: Aufzugsonboarding for {contractName}</div>
         <div class="navbar-right">
             <lightning-button 
                 label="Veröffentlichen"
@@ -33,7 +33,7 @@
                             class="dropdown-item-icon">
                         </lightning-icon>
                         <div class="dropdown-user-info">
-                            <div class="dropdown-user-name">{userData.name}</div>
+                            <div class="dropdown-user-name">{userData.userName}</div>
                             <div class="dropdown-company-name">{userData.companyName}</div>
                         </div>
                     </div>
@@ -55,4 +55,4 @@
             </template>
         </div>
     </div>
-</template> 
+</template>

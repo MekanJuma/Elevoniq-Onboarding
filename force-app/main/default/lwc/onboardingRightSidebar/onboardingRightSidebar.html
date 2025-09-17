@@ -2,7 +2,7 @@
     <div class="right-sidebar-content">
         <!-- Fixed Header -->
         <div class="right-sidebar-header">
-            <h2 class="right-sidebar-title">{selectedTask.name}</h2>
+            <h2 class="right-sidebar-title">Details eingeben</h2>
             <lightning-button-icon
                 icon-name="utility:close"
                 variant="bare"
@@ -23,6 +23,13 @@
                         <span class="custom-section-title">{section.title}</span>
                     </div>
                     <div class="custom-section-body">
+                        <button 
+                            class="lookup-btn slds-button slds-button_neutral slds-button_stretch"
+                            data-object="property" 
+                            onclick={handleLookup}>
+                            <lightning-icon icon-name="utility:search" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                            <span>Liegenschaft auswählen</span>
+                        </button>
                         <lightning-input
                             label="Liegenschaftsname"
                             value={selectedTask.data.name}
@@ -71,7 +78,7 @@
                             data-object="account" 
                             onclick={handleLookup}>
                             <lightning-icon icon-name="utility:search" size="x-small" class="slds-m-right_x-small"></lightning-icon>
-                            <span>Lookup Account</span>
+                            <span>Konto auswählen</span>
                         </button>
                         <lightning-input
                             label="Firmenname"
@@ -183,6 +190,13 @@
                         <span class="custom-section-title">{section.title}</span>
                     </div>
                     <div class="custom-section-body">
+                        <button 
+                            class="lookup-btn slds-button slds-button_neutral slds-button_stretch"
+                            data-object="propertyUnit" 
+                            onclick={handleLookup}>
+                            <lightning-icon icon-name="utility:search" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                            <span>Verwaltungseinheit auswählen</span>
+                        </button>
                         <lightning-combobox
                             label="Gebäudetyp"
                             value={selectedTask.data.propertyType}
@@ -219,27 +233,6 @@
                         <span class="custom-section-title">{section.title}</span>
                     </div>
                     <div class="custom-section-body">
-                        <lightning-combobox
-                            label="Zahlungsmodalitäten"
-                            value={selectedTask.data.modeOfPayment}
-                            options={modeOfPaymentOptions}
-                            name="modeOfPayment"
-                            data-type="picklist"
-                            data-name="modeOfPayment"
-                            onchange={handleChange}>
-                        </lightning-combobox>
-
-                        <lightning-combobox
-                            if:true={selectedTask.data.isRecurring}
-                            label="Zahlungsintervall"
-                            value={selectedTask.data.paymentInterval}
-                            options={paymentIntervalOptions}
-                            name="paymentInterval"
-                            data-type="picklist"
-                            data-name="paymentInterval"
-                            onchange={handleChange}>
-                        </lightning-combobox>
-
                         <lightning-input
                             label="Kundenauftragsnummer"
                             value={selectedTask.data.customerOrderNumber}
@@ -275,7 +268,7 @@
                 <lightning-button 
                     if:false={section.isOrderDetails}
                     label="Entfernen"
-                    variant="brand-outline"
+                    variant="destructive-text"
                     onclick={clearAll}
                     class="slds-m-right_x-small">
                 </lightning-button>

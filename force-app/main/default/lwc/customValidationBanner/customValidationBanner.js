@@ -50,4 +50,4 @@ export default class ValidationMessage extends LightningElement {
             window.open(this.action.url, '_blank');
         }
     }
-} 
+}

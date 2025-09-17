@@ -7,7 +7,28 @@ global with sharing class OnboardingApiService {
         RestResponse res = RestContext.response;
 
         String userId = req.headers.get('userid');
+        String userEmail = req.headers.get('useremail');
         String contractId = req.headers.get('contractid');
+        String mode = req.headers.get('mode');
+
+        if (mode != null && mode.toLowerCase() == 'userinfo') {
+            
+            if (String.isBlank(userEmail)) {
+                res.statusCode = 400;
+                res.responseBody = Blob.valueOf(JSON.serialize(
+                    new ApiResponse(false, null, 'Missing required parameter: userEmail')
+                ));
+                return;
+            }
+
+            OnboardingController.UserInfos userInfos = OnboardingController.getUserInfo(userEmail);
+
+            res.statusCode = 200;
+            res.responseBody = Blob.valueOf(JSON.serialize(
+                new ApiResponse(true, userInfos, 'User info fetched successfully')
+            ));
+            return;
+        }
 
         if (String.isBlank(contractId) || String.isBlank(userId)) {
             res.statusCode = 400;
@@ -18,7 +39,7 @@ global with sharing class OnboardingApiService {
         }
 
         try {
-            OnboardingController.OnboardingData data = OnboardingController.getOnboardingData(contractId, userId);
+            OnboardingController.OnboardingData data = OnboardingController.getOnboardingData(contractId);
 
             res.statusCode = 200;
             res.responseBody = Blob.valueOf(JSON.serialize(

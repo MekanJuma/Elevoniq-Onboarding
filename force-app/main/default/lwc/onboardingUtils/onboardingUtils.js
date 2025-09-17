@@ -1,7 +1,3 @@
-
-
-
-
 const generateUniqueId = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
@@ -25,55 +21,45 @@ const formatAddress = (address) => {
 const getListType = (taskId) => {
     switch (taskId) {
         case 'property.details':
+        case 'property':
             return 'property';
+    
+        case 'account':
         case 'property.propertyOwner':
-            return 'account';
         case 'property.assetManager':
-            return 'account';
-
-        case 'propertyUnit.details':
-            return 'propertyUnit';
+        case 'order.benefitReceiver':
+        case 'order.invoiceReceiver':
         case 'propertyUnit.pm':
-            return 'account';
         case 'propertyUnit.fm':
-            return 'account';
         case 'propertyUnit.hv':
-            return 'account';
         case 'propertyUnit.operator':
             return 'account';
-            
-        case 'onSiteContacts.propertyManager':
-            return 'contact';
-        case 'onSiteContacts.houseKeeper':
-            return 'contact';
-        case 'onSiteContacts.attendant':
-            return 'contact';
-        case 'onSiteContacts.firstAider':
-            return 'contact';
-
-        case 'order.benefitReceiver':
-            return 'account';
-        case 'order.invoiceReceiver':
-            return 'account';
-
-        case 'account':
-            return 'account';
+    
+        case 'propertyUnit':
+        case 'propertyUnit.details':
+            return 'propertyUnit';
+    
         case 'contact':
+        case 'onSiteContacts.propertyManager':
+        case 'onSiteContacts.houseKeeper':
+        case 'onSiteContacts.attendant':
+        case 'onSiteContacts.firstAider':
             return 'contact';
 
         default:
             return null;
     }
+    
 }
 
 
 const formatListItems = (list, taskId) => {
     let type = getListType(taskId);
+    // console.log('type: ', type, taskId, JSON.stringify(list))
     return (list || []).map(item => {
         let title = '';
         let description = '';
         let icon = 'utility:checkin';
-
         switch (type) {
             case 'account':
                 title = item.name || '';
@@ -88,7 +74,7 @@ const formatListItems = (list, taskId) => {
                 break;
 
             case 'property':
-                title = formatAddress(item.address);
+                title = item.name;
                 description = item.businessUnit || '';
                 icon = 'utility:home';
                 break;
@@ -147,6 +133,7 @@ const updateOrCreateAndApply = (list, existingId, template, fieldMap) => {
     if (!record) {
         record = JSON.parse(JSON.stringify(template));
         record.id = `newItem_${generateUniqueId()}`;
+        record.externalId = record.id;
         list.push(record);
     }
 

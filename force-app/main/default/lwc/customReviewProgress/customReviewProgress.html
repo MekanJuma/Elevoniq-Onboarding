@@ -1,0 +1,28 @@
+<template>
+    <div class="step-pill-container">
+        <template for:each={steps} for:item="step">
+            <div 
+                lwc:if={step.isActive}
+                key={step.key}
+                class="step-pill slds-p-horizontal_medium slds-p-vertical_x-small
+                    slds-grid slds-align_absolute-center
+                    active"
+                onclick={handleClick}
+                data-step={step.key} data-label={step.label}>
+                <lightning-icon icon-name={step.icon} size="xx-small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{step.label}</span>
+            </div>
+
+            <div 
+                lwc:else
+                key={step.key}
+                class="step-pill slds-p-horizontal_medium slds-p-vertical_x-small
+                    slds-grid slds-align_absolute-center"
+                onclick={handleClick}
+                data-step={step.key} data-label={step.label}>
+                <lightning-icon icon-name={step.icon} size="xx-small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{step.label}</span>
+            </div>
+        </template>
+    </div>
+</template>

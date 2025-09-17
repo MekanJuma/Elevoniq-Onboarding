@@ -1,3 +1,22 @@
+/* ! Onboarding Card - Start */
+.card-header {
+    background-color: #f7f9fb;
+    padding-bottom: 12px;
+    border: 1px solid transparent;
+    border-radius: 5px 5px 0 0;
+}
+
+.banner {
+    margin-bottom: 12px;
+}
+
+.elevator-list {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+
 .elevator-item {
     border-bottom: 1px solid #e5e5e5;
     min-height: 40px;
@@ -10,21 +29,137 @@
 .elevator-item:hover {
     background-color: #f3f3f3;
 }
+/* ! Onboarding Card - End */
 
-.elevator-list {
-    max-height: 400px;
+/* ! Share Modal - Start */
+.share-modal {
+    max-width: 800px !important;
+    width: 800px !important;
+}
+
+.share-modal-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.contact-search-container {
+    position: relative;
+}
+
+.contact-search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    max-height: 200px;
     overflow-y: auto;
-    border: 1px solid #e5e5e5;
-    border-radius: 4px;
+    background: white;
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.card-header {
-    background-color: #f7f9fb;
-    padding-bottom: 12px;
-    border: 1px solid transparent;
-    border-radius: 5px 5px 0 0;
+.contact-option {
+    cursor: pointer;
+    border-radius: 0.25rem;
 }
 
-.banner {
-    margin-bottom: 12px;
+.contact-option:hover {
+    background-color: #f3f3f3;
 }
+
+.slds-pill_container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.slds-pill {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f3f3f3;
+    border: 1px solid #d8dde6;
+    border-radius: 1rem;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.25;
+}
+
+.slds-pill__icon {
+    margin-right: 0.25rem;
+}
+
+.slds-pill__label {
+    margin-right: 0.25rem;
+}
+
+.slds-pill__remove {
+    margin-left: 0.25rem;
+}
+
+.template-preview {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 5px;
+    padding-bottom: 120px;
+}
+/* ! Share Modal - End */
+
+/* ! Review Modal - Start */
+.review-header {
+    background-color: #0176d3;
+    color: white;
+    border-bottom: 1px solid;
+}
+.review-modal-container {
+    max-width: 80% !important;
+    width: 80% !important;
+}
+
+.review-modal-content {
+    overflow: hidden !important;
+}
+
+.review-modal-sidebar {
+    width: 20% !important;
+    overflow: auto !important;
+}
+
+.review-modal-content-right {
+    width: 80% !important;
+    overflow: auto !important;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.form-layout {
+    display: flex;
+    gap: 30px;
+    transition: all 0.3s ease;
+}
+
+/* ! Review Modal - End */

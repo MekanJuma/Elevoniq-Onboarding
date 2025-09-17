@@ -1,0 +1,141 @@
+<template>
+    <div class="form-column">
+        <!-- ! Column Header - DONE -->
+        <div class="column-header">
+            <div class="column-title">
+                <i class="fas fa-history">
+                    <lightning-icon 
+                        icon-name="utility:real_time"
+                        alternative-text="real_time" 
+                        size="small"
+                        title="real_time"
+                        style="margin-right: 10px;"
+                    ></lightning-icon>
+                    {headerTitle}
+                </i>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <!-- ! Section Title -->
+            <div class="section-title">
+                <lightning-icon icon-name={objectData.iconName} class="bluebg-icon" size="small"></lightning-icon>
+                <span>{objectData.title}</span>
+                <div 
+                    data-lookup-fields={objectData.lookupFields} 
+                    class="lookup-btn"
+                    data-object-name={objectData.objectName} 
+                    onclick={handleLookup}
+                    if:true={showLookupBtn}
+                >
+                    <span>
+                        <lightning-icon 
+                            icon-name="standard:search"
+                            alternative-text="search" 
+                            size="medium" 
+                            title="search"
+                            class="search-icon"
+                        ></lightning-icon>
+                    </span>
+                </div>
+            </div>
+
+            <!-- ! Section Content -->
+            <template for:each={objectData.fields} for:item="field">
+                <div class="slds-col slds-size_1-of-1" key={field.id}>
+                    <div lwc:if={field.isList} style="margin-top: 15px;">
+                        <label>{field.name}</label>
+                        <lightning-pill-container items={field.list}></lightning-pill-container>
+                    </div>
+                    <lightning-combobox
+                        lwc:elseif={field.isPicklist}
+                        name={field.name}
+                        label={field.name}
+                        placeholder="Choose option"
+                        value={field.value}
+                        onchange={handleChange}
+                        options={field.options}
+                        data-field-name={field.fieldName}
+                        data-id={objectData.rowId}
+                        disabled={isPrevious}
+                    >
+                    </lightning-combobox>
+                    <lightning-input 
+                        lwc:else
+                        type="text" 
+                        label={field.name} 
+                        value={field.value}
+                        data-field-name={field.fieldName}
+                        data-id={objectData.rowId}
+                        onchange={handleChange}
+                        disabled={isPrevious}>
+                    </lightning-input>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- ! Lookup Modal -->
+    <template if:true={showLookupModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" style="background: rgba(0, 0, 0, 0.16);">
+            <div class="slds-modal__container" style="width: 1500px !important;">
+                <!-- !Header -->
+                <header class="slds-modal__header">
+                    <h3 class="lookup-title">Search Existing Records</h3>
+                    <!-- Search -->
+                    <lightning-input 
+                        type="search" 
+                        variant="label-hidden" 
+                        placeholder="Search records..."
+                        value={lookupSearchKey} 
+                        onchange={handleLookupSearchChange}>
+                    </lightning-input>
+                </header>
+
+                <!-- ! Body -->
+                <div class="slds-modal__content slds-p-around_medium modalBodySpinner">
+                    <!-- Loading Spinner -->
+                    <template if:true={showLookupLoading}>
+                        <lightning-spinner alternative-text="Loading" size="medium" class="spinnerClass"></lightning-spinner>
+                    </template>
+                    <!-- Datatable -->
+                    <template if:true={lookupRecords.length}>
+                        <lightning-datatable 
+                            key-field="Id" 
+                            data={lookupRecords} 
+                            columns={lookupColumns}
+                            hide-checkbox-column={hideCheckbox} 
+                            max-row-selection={maxRowSelection}
+                            onrowselection={handleRowSelection}>
+                        </lightning-datatable>
+                    </template>
+                    <!-- No Data Banner -->
+                    <template if:false={lookupRecords.length}>
+                        <div class="banner">
+                            <c-custom-validation-banner illustrator="noContent-small" title="No Data Found">
+                            </c-custom-validation-banner>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- ! Footer -->
+                <footer class="slds-modal__footer">
+                    <lightning-button 
+                        label="Cancel" 
+                        onclick={closeLookupModal}
+                    ></lightning-button>
+                    <lightning-button 
+                        class="slds-m-left_medium" 
+                        variant="brand" 
+                        label="Select" 
+                        onclick={handleSelect}
+                        disabled={selectRowDisabled}
+                    ></lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <!-- ! Backdrop -->
+        <div class="slds-backdrop slds-backdrop_open" onclick={handleModalBackdropClick}></div>
+    </template>
+</template>

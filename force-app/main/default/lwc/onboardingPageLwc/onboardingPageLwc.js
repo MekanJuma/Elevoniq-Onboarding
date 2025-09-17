@@ -1,10 +1,11 @@
 import { LightningElement, track } from 'lwc';
-import LightningConfirm from 'lightning/confirm';
+import OnboardingPageUrl from '@salesforce/label/c.Onboarding_Page';
 
 import { 
     getOnboardingData,
     publishOnboardingData,
-    uploadCsvData
+    uploadCsvData,
+    getUserInfo
 } from 'c/onboardingApiService';
 
 import { 
@@ -29,12 +30,16 @@ import {
     extractPrefixedFields,
     updateOrCreateAndApply,
     getList,
-    formatListItems
+    formatListItems,
+    generateUniqueId
 } from 'c/onboardingUtils';
+
+
 
 
 export default class OnboardingPageLwc extends LightningElement {
     noElevatorsFound = NO_ELEVATORS_FOUND;
+    loginUrl = `${OnboardingPageUrl}/login`;
 
     parameters = {};
 
@@ -49,7 +54,10 @@ export default class OnboardingPageLwc extends LightningElement {
 
     @track isLoading = false;
     @track error;
-    
+
+    @track userData = {};
+    @track contractName = '';
+
     @track elevators = [];
     @track properties = [];
     @track propertyUnits = [];
@@ -264,6 +272,15 @@ export default class OnboardingPageLwc extends LightningElement {
         return this.validationErrors.find(error => error.id === this.selectedElevator?.id);
     }
 
+    get context() {
+        return {
+            contractId: this.parameters?.contractId,
+            userId: localStorage.getItem('auth_user_id'),
+            userEmail: localStorage.getItem('auth_email')
+        };
+    }
+    
+
     async fetchOnboardingData() {
         try {
             this.isLoading = true;
@@ -275,11 +292,10 @@ export default class OnboardingPageLwc extends LightningElement {
             this.contacts = [];
             this.orders = [];
     
-            console.log('this.parameters', JSON.stringify(this.parameters));
-            let onboarding = await getOnboardingData({
-                userId: this.parameters.userId,
-                contractId: this.parameters.contractId
-            });
+            console.log('this.parameters', JSON.stringify(this.context));
+            let onboarding = await getOnboardingData(this.context);
+
+            this.contractName = onboarding.data.contractName;
 
             this.elevators = onboarding.data.elevators.map((elevator, index) => ({
                 ...elevator,
@@ -308,13 +324,64 @@ export default class OnboardingPageLwc extends LightningElement {
 
     // ✅ done
     async connectedCallback() {
+        this.isLoading = true;
         this.parameters = this.getQueryParameters();
+        const isAuthenticated = this.handleAuthentication(this.parameters);
+    
+        if (!isAuthenticated) return;
+    
+        const userInfo = await getUserInfo({...this.context, mode: 'userinfo'});
+        console.log('userInfo', userInfo, JSON.stringify(this.context));
+
+        this.userData = userInfo.data;
+        this.isLoading = false;
 
         await this.fetchOnboardingData();
-
+    
         this.applyBodyStyles();
         window.addEventListener('beforeunload', this.handleBeforeUnload);
     }
+
+    handleAuthentication(params) {
+        const tokenKey = 'auth_token';
+        const expiryKey = 'auth_token_expiry';
+        const emailKey = 'auth_email';
+        
+        const now = Date.now();
+        const token = params.token;
+    
+        if (token) {
+            localStorage.setItem(tokenKey, token);
+            localStorage.setItem(expiryKey, (now + 30 * 24 * 60 * 60 * 1000).toString());
+        }
+    
+        if (params.email) {
+            localStorage.setItem(emailKey, params.email);
+        }
+    
+        if (token) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('token');
+            url.searchParams.delete('userId');
+            url.searchParams.delete('email');
+            window.history.replaceState({}, '', url.toString());
+        }
+    
+        const validToken = localStorage.getItem(tokenKey);
+        const validExpiry = parseInt(localStorage.getItem(expiryKey), 10);
+    
+        if (!validToken || isNaN(validExpiry) || now > validExpiry) {
+            const currentUrl = encodeURIComponent(window.location.href);
+            const loginUrl = `${this.loginUrl}?redirectUrl=${currentUrl}`;
+            window.location.href = loginUrl;
+            return false;
+        }
+    
+        return true;
+    }
+    
+    
+    
 
     // ✅ done
     disconnectedCallback() {
@@ -339,6 +406,7 @@ export default class OnboardingPageLwc extends LightningElement {
         const newElevator = {
             ...JSON.parse(JSON.stringify(ELEVATOR)),
             id: elevatorId,
+            externalId: elevatorId,
             name: elevatorName
         };
 
@@ -454,12 +522,12 @@ export default class OnboardingPageLwc extends LightningElement {
 
     async handleUploadCsvModalUpload(event) {
         const { fileName, fileContent } = event.detail;
-        console.log('Uploaded:', fileName, fileContent);
+        this.isLoading = true;
+        // console.log('Uploaded:', fileName, JSON.stringify(fileContent));
 
         try {
             const extraHeaders = {
-                userId: this.parameters.userId,
-                contractId: this.parameters.contractId,
+                ...this.context,
                 mode: 'upload'
             }
             const result = await uploadCsvData({data: fileContent}, extraHeaders);
@@ -470,6 +538,7 @@ export default class OnboardingPageLwc extends LightningElement {
             this.triggerToast('Error', error.message || error.body?.message || 'Failed to upload CSV', 'error');
         } finally {
             this.showUploadCsvModal = false;
+            this.isLoading = false;
         }
     }
 
@@ -545,6 +614,7 @@ export default class OnboardingPageLwc extends LightningElement {
                 !this.properties.some(existing => existing.id === p.id)
             ) {
                 this.properties.push(p);
+                if (p.propertyOwnerId) relatedAccountIds.add(p.propertyOwnerId);
             }
         });
 
@@ -569,8 +639,8 @@ export default class OnboardingPageLwc extends LightningElement {
         // ! === Toast modal summary ===
         const total = newElevatorsCount + skippedElevatorsCount;
         this.triggerToast(
-            'Upload Complete',
-            `${total} elevators processed: ${newElevatorsCount} uploaded, ${skippedElevatorsCount} skipped due to duplication.`,
+            'Hochladen abgeschlossen',
+            `${total} Aufzüge verarbeitet: ${newElevatorsCount} hochgeladen, ${skippedElevatorsCount} ausgelassen aufgrund von Duplikaten.`,
             'success'
         );
     }
@@ -602,12 +672,10 @@ export default class OnboardingPageLwc extends LightningElement {
                 const productMap = new Map();
 
                 this.orders.forEach(order => {
-                    let baseDescription = order.isRecurring
-                        ? `${order.paymentInterval} - ${order.modeOfPayment}`
-                        : order.modeOfPayment;
+                    let baseDescription = "";
 
                     if (order.customerOrderNumber) {
-                        baseDescription = `${order.customerOrderNumber} | ${baseDescription}`;
+                        baseDescription = `${order.customerOrderNumber}`;
                     }
                     (order.orderItems || []).forEach(item => {
                         let isSelected = selectedProductIds.includes(item.productId);
@@ -669,18 +737,9 @@ export default class OnboardingPageLwc extends LightningElement {
 
         this.existingRecords = formatListItems(otherList, taskId);
 
-        if (taskId !== 'property.details' && taskId !== 'propertyUnit.details') {
-            setTimeout(() => {
-                this.openRightSidebar();
-            }, 200);
-        } else if (data.completed || data?.contact?.completed || otherList.length === 0) {
-            setTimeout(() => {
-                this.openRightSidebar(); 
-            }, 200);
-        } else {
-            this.lookupObject = LOOKUP_OBJECTS[taskId.split('.')[0]];
-            this.showExistingRecordModal = true;
-        }
+        setTimeout(() => {
+            this.openRightSidebar(); 
+        }, 200);
     }
 
     // ✅ done
@@ -781,7 +840,6 @@ export default class OnboardingPageLwc extends LightningElement {
     // ✅ done
     validateAndConfirmDraftChanges() {
         if (Object.keys(this.draftChanges).length > 0) {
-            console.log('draftChanges', JSON.stringify(this.draftChanges));
             const confirmCancel = window.confirm('Sie haben ungespeicherte Änderungen. Sind Sie sicher, dass Sie abbrechen möchten? Änderungen werden verlorengehen.');
             if (!confirmCancel) {
                 return false;
@@ -856,11 +914,10 @@ export default class OnboardingPageLwc extends LightningElement {
         const missingFields = this.validateRequiredFields();
         if (missingFields.length > 0) {
             console.log('draftChanges', JSON.stringify(this.draftChanges));
-            this.triggerToast('Missing Required Fields', `Please fill in: ${missingFields.join(', ')}`, 'error');
+            this.triggerToast('Pflichtfelder fehlen', `Bitte ausfüllen: ${missingFields.join(', ')}`, 'error');
             return;
         }
     
-        console.log('darftchanges: ', JSON.stringify(this.draftChanges));
         const elevator = this.selectedElevatorDetails;
         const [objectKey, subKey] = this.selectedTask.id.split('.');
         const draft = this.draftChanges[objectKey]?.[subKey] || {};
@@ -912,6 +969,7 @@ export default class OnboardingPageLwc extends LightningElement {
                 if (groups.contact) {
                     const contact = updateOrCreateAndApply(this.contacts, unit[`${subKey}Id`], CONTACT, groups.contact);
                     unit[`${subKey}Id`] = contact.id;
+                    unit.isChanged = true;
                 }
                 break;
     
@@ -938,7 +996,7 @@ export default class OnboardingPageLwc extends LightningElement {
         this.selectedTask = {};
         this.closeRightSidebar(false);
 
-        this.triggerToast('Success', 'Changes saved successfully', 'success');
+        this.triggerToast('Success', 'Änderungen erfolgreich gespeichert', 'success');
     }
 
     // ✅ done
@@ -991,10 +1049,17 @@ export default class OnboardingPageLwc extends LightningElement {
 
         this.lookupObject = LOOKUP_OBJECTS[object];
 
-        let list = object === 'account' ? this.accounts : this.contacts;
-        let currentId = object === 'account' ? this.selectedTask.data.id : this.selectedTask.data?.contact?.id;
+        let list = object === 'account' ? 
+                    this.accounts : object === 'property' ? 
+                    this.properties : object === 'propertyUnit' ? 
+                    this.propertyUnits : this.contacts;
+        let currentId = object === 'account' ? 
+                        this.selectedTask.data.id : object === 'property' ? 
+                        this.selectedTask.data.id : object === 'propertyUnit' ? 
+                        this.selectedTask.data.id : this.selectedTask.data?.contact?.id;
         let otherList = getList(list, currentId);
         
+
         this.existingRecords = formatListItems(otherList, object);
 
         this.showExistingRecordModal = true;
@@ -1101,16 +1166,42 @@ export default class OnboardingPageLwc extends LightningElement {
     // ✅ done
     handleExistingRecordSelectConfirm() {
         let selectedRecord = this.existingRecords.find(record => record.isSelected);
+        const rightSidebar = this.template.querySelector('c-onboarding-right-sidebar');
+        const list = this.lookupObject.objectType === 'account' ? this.accounts : 
+                        this.lookupObject.objectType === 'property' ? this.properties : 
+                        this.lookupObject.objectType === 'propertyUnit' ? this.propertyUnits : this.contacts;
+        
+        const data = list.find(item => item.id === selectedRecord.id);
         
         if (this.selectedTask.id === 'property.details') {
+            const currentPropertyId = this.selectedElevator.propertyId;
+
+            this.propertyUnits
+                .filter(unit => unit.propertyId === currentPropertyId)
+                .forEach(unit => {
+                    unit.propertyId = selectedRecord.id;
+                    unit.isChanged = true;
+                });
+
             this.selectedElevator.propertyId = selectedRecord.id;
+
+            if (rightSidebar) {
+                rightSidebar.setInputValues({
+                    name: data.name,
+                    address: data.address,
+                    businessUnit: data.businessUnit
+                })
+            }
         } else if (this.selectedTask.id === 'propertyUnit.details') {
             this.selectedElevator.propertyUnitId = selectedRecord.id;
+            if (rightSidebar) {
+                rightSidebar.setInputValues({
+                    name: data.name,
+                    address: data.address,
+                    propertyType: data.propertyType
+                })
+            }
         } else {
-            const list = this.lookupObject.objectType === 'account' ? this.accounts : this.contacts;
-            const data = list.find(item => item.id === selectedRecord.id);
-
-            const rightSidebar = this.template.querySelector('c-onboarding-right-sidebar');
             if (rightSidebar) {
                 rightSidebar.setInputValues({
                     [`${this.lookupObject.objectType}.name`]: data.name,
@@ -1127,12 +1218,18 @@ export default class OnboardingPageLwc extends LightningElement {
             const [objectKey, subKey] = this.selectedTask.id.split('.');
             const referenceList = objectKey == 'property' ? this.properties :
                                 objectKey == 'order' ? this.elevators : this.propertyUnits;
-            let refId = objectKey == 'order' ? 'id' : `${objectKey}Id`;
+            let refId = objectKey == 'order' ? 'id' : objectKey == 'onSiteContacts' ? `propertyUnitId` : `${objectKey}Id`;
             let referenceObject = referenceList.find(item => item.id === this.selectedElevator[refId]);
             
             let refContactKey = objectKey == 'onSiteContacts' ? `${subKey}Id` : `${subKey}ContactId`;
             let referenceKey = this.lookupObject.objectType == 'account' ? `${subKey}Id` : refContactKey;
+            
             referenceObject[referenceKey] = selectedRecord.id;
+            referenceObject.isChanged = true;
+
+            if (objectKey == 'onSiteContacts') {
+                this.contacts.find(c => c.id === selectedRecord.id).isChanged = true;
+            }
         }
 
         this.handleExistingRecordCancel();
@@ -1203,7 +1300,7 @@ export default class OnboardingPageLwc extends LightningElement {
         this.selectedTask = {};
         this.showProductAssignmentModal = false;
         console.log('elevators', JSON.stringify(this.elevators));
-        this.triggerToast('Success', 'Product/s assigned successfully', 'success');
+        this.triggerToast('Success', 'Produkt(e) erfolgreich zugewiesen', 'success');
     }
     
     // ✅ done
@@ -1284,38 +1381,38 @@ export default class OnboardingPageLwc extends LightningElement {
             };
 
             // Elevator fields
-            if (!e.name) errorObj.elevatorErrors.push({ message: 'Elevator Name is missing', field: 'name' });
-            if (!e.propertyId) errorObj.elevatorErrors.push({ message: 'Elevator Property is missing', field: 'propertyId' });
-            if (!e.propertyUnitId) errorObj.elevatorErrors.push({ message: 'Elevator Property Unit is missing', field: 'propertyUnitId' });
+            if (!e.name) errorObj.elevatorErrors.push({ message: 'Name ist erforderlich', field: 'name' });
+            if (!e.propertyId) errorObj.elevatorErrors.push({ message: 'Liegenschaft ist erforderlich', field: 'propertyId' });
+            if (!e.propertyUnitId) errorObj.elevatorErrors.push({ message: 'Verwaltungseinheit ist erforderlich', field: 'propertyUnitId' });
 
             // Order fields
-            if (!e.benefitReceiverId) errorObj.orderErrors.push({ message: 'Benefit Receiver is missing', field: 'benefitReceiverId' });
-            if (!e.invoiceReceiverId) errorObj.orderErrors.push({ message: 'Invoice Receiver is missing', field: 'invoiceReceiverId' });
+            if (!e.benefitReceiverId) errorObj.orderErrors.push({ message: 'Leistungsempfänger ist erforderlich', field: 'benefitReceiverId' });
+            if (!e.invoiceReceiverId) errorObj.orderErrors.push({ message: 'Rechnungsempfänger ist erforderlich', field: 'invoiceReceiverId' });
 
             // Product assignment
             if (!e.productAssignments || e.productAssignments.length === 0) {
-                errorObj.orderErrors.push({ message: 'Product is not assigned', field: 'productAssignments' });
+                errorObj.orderErrors.push({ message: 'Produkt ist nicht zugewiesen', field: 'productAssignments' });
             }
 
             // Property errors — find related property
             const property = this.properties.find(p => p.id === e.propertyId);
-            // if (property) {
-            //     if (!property.propertyOwnerId) {
-            //         errorObj.propertyErrors.push({ message: 'Property Owner is required', field: 'propertyOwnerId' });
-            //     }
-            // }
+            if (property) {
+                if (!property.propertyOwnerId) {
+                    errorObj.propertyErrors.push({ message: 'Eigentümer ist erforderlich', field: 'propertyOwnerId' });
+                }
+            }
 
             // Property Unit errors — find related property unit
             const propertyUnit = this.propertyUnits.find(pu => pu.id === e.propertyUnitId);
             if (propertyUnit) {
                 if (!propertyUnit.operatorId) {
-                    errorObj.propertyUnitErrors.push({ message: 'Operator is required', field: 'operatorId' });
+                    errorObj.propertyUnitErrors.push({ message: 'Betreiber ist erforderlich', field: 'operatorId' });
                 }
                 if (!propertyUnit.propertyManagerId) {
-                    errorObj.propertyUnitErrors.push({ message: 'Property Manager is required', field: 'propertyManagerId' });
+                    errorObj.propertyUnitErrors.push({ message: 'Objektbetreuer ist erforderlich', field: 'propertyManagerId' });
                 }
                 if (!propertyUnit.houseKeeperId) {
-                    errorObj.propertyUnitErrors.push({ message: 'House Keeper is required', field: 'houseKeeperId' });
+                    errorObj.propertyUnitErrors.push({ message: 'Hausmeister ist erforderlich', field: 'houseKeeperId' });
                 }
             }
 
@@ -1333,6 +1430,32 @@ export default class OnboardingPageLwc extends LightningElement {
         return errorsByElevator;
     }
 
+    isAnyRelatedChanged(elevator) {
+        let property = this.properties.find(p => p.id === elevator.propertyId);
+        let propertyUnit = this.propertyUnits.find(pu => pu.id === elevator.propertyUnitId);
+
+        return this.properties.some(p => p.id === elevator.propertyId && p.isChanged) ||
+            this.propertyUnits.some(pu => pu.id === elevator.propertyUnitId && pu.isChanged) ||
+            this.accounts.some(a => a.id === elevator.benefitReceiverId && a.isChanged) ||
+            this.accounts.some(a => a.id === elevator.invoiceReceiverId && a.isChanged) ||
+            this.accounts.some(a => a.id === property.propertyOwnerId && a.isChanged) ||
+            this.accounts.some(a => a.id === property.assetManagerId && a.isChanged) ||
+            this.accounts.some(a => a.id === propertyUnit.pmId && a.isChanged) ||
+            this.accounts.some(a => a.id === propertyUnit.fmId && a.isChanged) ||
+            this.accounts.some(a => a.id === propertyUnit.hvId && a.isChanged) ||
+            this.accounts.some(a => a.id === propertyUnit.operatorId && a.isChanged) ||
+            this.contacts.some(c => c.id === property.propertyOwnerContactId && c.isChanged) ||
+            this.contacts.some(c => c.id === property.assetManagerContactId && c.isChanged) ||
+            this.contacts.some(c => c.id === propertyUnit.pmContactId && c.isChanged) ||
+            this.contacts.some(c => c.id === propertyUnit.fmContactId && c.isChanged) ||
+            this.contacts.some(c => c.id === propertyUnit.hvContactId && c.isChanged) ||
+            this.contacts.some(c => c.id === propertyUnit.operatorContactId && c.isChanged) ||
+            this.contacts.some(c => c.id === propertyUnit.propertyManagerId && c.isChanged) ||
+            this.contacts.some(c => c.id === propertyUnit.houseKeeperId && c.isChanged) ||
+            this.contacts.some(c => c.id === propertyUnit.attendantId && c.isChanged) ||
+            this.contacts.some(c => c.id === propertyUnit.firstAiderId && c.isChanged);
+    }
+
     // ! Publish
     async handlePublish() {
         this.isLoading = true;
@@ -1344,6 +1467,7 @@ export default class OnboardingPageLwc extends LightningElement {
     
         this.elevators = this.elevators.map(elevator => ({
             ...elevator,
+            isChanged: this.isAnyRelatedChanged(elevator),
             className: failedElevatorIds.has(elevator.id) ? 'tab failed-tab' : this.selectedElevator.id == elevator.id ? 'tab active-tab' : 'tab'
         }));
 
@@ -1354,14 +1478,11 @@ export default class OnboardingPageLwc extends LightningElement {
                     orders: this.orders.filter(o => o.isChanged),
                     ...this.prepareFinalData()
                 }
-                const extraHeaders = {
-                    userId: this.parameters.userId,
-                    contractId: this.parameters.contractId
-                }
+                console.log('context', JSON.stringify(this.context));
                 console.log('data', JSON.stringify(data));
-                const result = await publishOnboardingData(data, extraHeaders);
+                const result = await publishOnboardingData(data, this.context);
                 console.log('result', result);
-                this.triggerToast('Success', 'Data published successfully', 'success');
+                this.triggerToast('Success', 'Daten erfolgreich veröffentlicht', 'success');
                 this.fetchOnboardingData();
             } catch (error) {
                 this.isLoading = false;
@@ -1379,6 +1500,23 @@ export default class OnboardingPageLwc extends LightningElement {
     handleValidationModalCancel() {
         this.showValidationModal = false;
     }
+
+
+
+    // ! Sign out
+    handleSignOut() {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_token_expiry');
+        localStorage.removeItem('auth_email');
+        localStorage.removeItem('auth_user_id');
+        localStorage.removeItem('auth_name');
+        localStorage.removeItem('auth_company');
+    
+        const currentUrl = encodeURIComponent(window.location.href);
+        const loginUrl = `${this.loginUrl}?redirectUrl=${currentUrl}`;
+        window.location.href = loginUrl;
+    }
+    
 
 
 

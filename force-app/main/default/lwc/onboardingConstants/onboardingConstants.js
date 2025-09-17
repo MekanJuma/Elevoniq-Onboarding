@@ -10,14 +10,14 @@ const ELEVATOR_STATUS = {
 
 const NO_ELEVATORS_FOUND = {
     ILLUSTRATOR: 'noContent',
-    TITLE: 'No Elevators Found',
-    MESSAGE: "It's time to add your first elevator",
+    TITLE: 'Keine Aufzüge gefunden',
+    MESSAGE: "Es ist Zeit, Ihren ersten Aufzug hinzuzufügen",
 }
 
 const ERROR = {
     ILLUSTRATOR: 'noAccess',
-    TITLE: 'Something went wrong',
-    MESSAGE: "Please try again",
+    TITLE: 'Etwas ist schiefgelaufen',
+    MESSAGE: "Bitte versuchen Sie es erneut",
 }
 
 
@@ -97,10 +97,6 @@ const CONTACT_REQUIRED_FIELDS = [
         id: 'contact.lastName',
         name: "Last Name"
     },
-    {
-        id: 'contact.email',
-        name: "Email"
-    }
 ]
 
 const REQUIRED_FIELDS = {
@@ -170,88 +166,88 @@ const STEPS = {
 const SECTIONS_MAP = {
     'property.details': {
         isProperty: true,
-        title: "Property Details",
+        title: "Liegenschaft",
         icon: "utility:checkin",
     },
     'property.propertyOwner': {
         isAccount: true,
         isContact: true,
-        title: "Property Owner",
+        title: "Eigentümer",
         icon: "utility:company",
     },
     'property.assetManager': {
         isAccount: true,
         isContact: true,
-        title: "Asset Manager",
+        title: "AM Unternehmen",
         icon: "utility:company",
     },
     'propertyUnit.details': {
         isPropertyUnit: true,
-        title: "Property Unit Details",
+        title: "Verwaltungseinheit",
         icon: "utility:checkin",
     },
     'propertyUnit.pm': {
         isAccount: true,
         isContact: true,
-        title: "Property Management",
+        title: "PM Unternehmen",
         icon: "utility:company",
     },
     'propertyUnit.fm': {
         isAccount: true,
         isContact: true,
-        title: "Facility Management",
+        title: "FM Unternehmen",
         icon: "utility:company",
     },
     'propertyUnit.hv': {
         isAccount: true,
         isContact: true,
-        title: "Hausverwaltung",
+        title: "HV (Hausverwaltung)",
         icon: "utility:company",
     },
     'propertyUnit.operator': {
         isAccount: true,
         isContact: true,
-        title: "Operator",
+        title: "Betreiber",
         icon: "utility:company",
     },
     'onSiteContacts.propertyManager': {
         isContact: true,
-        title: "Property Manager",
+        title: "Objektbetreuer",
         icon: "utility:company",
     },
     'onSiteContacts.houseKeeper': {
         isContact: true,
-        title: "Housekeeper",
+        title: "Hausmeister",
         icon: "utility:company",
     },
     'onSiteContacts.attendant': {
         isContact: true,
-        title: "Attendant",
+        title: "Aufzugswärter",
         icon: "utility:company",
     },
     'onSiteContacts.firstAider': {
         isContact: true,
-        title: "First Aider",
+        title: "Ersthelfer",
         icon: "utility:company",
     },
     'order.details': {
         isOrderDetails: true,
-        title: "Order Details",
+        title: "Bestellung",
         icon: "utility:money",
     },
     'order.productAssignment': {
         isProductAssignment: true,
-        title: "Product Assignment",
+        title: "Produktzuordnung",
         icon: "utility:assignment",
     },
     'order.benefitReceiver': {
         isAccount: true,
-        title: "Benefit Receiver",
+        title: "Leistungsempfänger",
         icon: "utility:company",
     },
     'order.invoiceReceiver': {
         isAccount: true,
-        title: "Invoice Receiver",
+        title: "Rechnungsempfänger",
         icon: "utility:company",
     }
 }
@@ -286,7 +282,6 @@ const LOOKUP_OBJECTS = {
 
 // ! DATA/OBJECT STRUCTURE
 const PROPERTY = {
-    id: `newProperty_${generateUniqueId()}`,
     businessUnit: "",
     address: {
         street: "",
@@ -302,7 +297,6 @@ const PROPERTY = {
 }
 
 const PROPERTY_UNIT = {
-    id: `newPropertyUnit_${generateUniqueId()}`,
     propertyType: "",
     address: {
         street: "",
@@ -341,7 +335,6 @@ const ELEVATOR = {
 }
 
 const ACCOUNT = {
-    id: `newAccount_${generateUniqueId()}`,
     name: "",
     email: "",
     type: "",
@@ -357,7 +350,6 @@ const ACCOUNT = {
 }
 
 const CONTACT = {
-    id: `newContact_${generateUniqueId()}`,
     firstName: "",
     lastName: "",
     title: "",
@@ -372,8 +364,6 @@ const CONTACT = {
 const ORDER = {
     order: {
         id: `newOrder_${generateUniqueId()}`,
-        modeOfPayment: "",
-        paymentInterval: "",
         customerOrderNumber: "",
         type: "",
         comment: ""
@@ -386,6 +376,8 @@ const ORDER = {
         }
     }     
 }
+
+
 
 
 

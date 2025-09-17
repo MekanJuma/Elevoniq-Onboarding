@@ -2,8 +2,6 @@ import { LightningElement, api } from 'lwc';
 import { 
     SECTIONS_MAP, 
     PROPERTY_TYPE_OPTIONS,
-    MODE_OF_PAYMENT_OPTIONS,
-    PAYMENT_INTERVAL_OPTIONS,
     SALUTATION_OPTIONS
 } from 'c/onboardingConstants';
 
@@ -11,8 +9,6 @@ export default class OnboardingRightSidebar extends LightningElement {
     @api selectedTask;
 
     propertyTypeOptions = PROPERTY_TYPE_OPTIONS;
-    modeOfPaymentOptions = MODE_OF_PAYMENT_OPTIONS;
-    paymentIntervalOptions = PAYMENT_INTERVAL_OPTIONS;
     salutationOptions = SALUTATION_OPTIONS;
 
 

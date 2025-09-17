@@ -1,117 +1,274 @@
 <template>
     <article class="slds-card">
-        <!-- Card Header -->
+        <!-- ! Card Header -->
         <div class="slds-card__header slds-grid slds-grid_align-spread slds-grid_vertical-align-center card-header">
             <div class="slds-grid slds-grid_vertical-align-center">
                 <span class="slds-icon_container slds-icon-utility-setup slds-m-right_x-small" title="Onboarding">
-                    <lightning-icon icon-name="utility:setup" size="small" class="slds-icon slds-icon_small"></lightning-icon>
+                    <lightning-icon icon-name="utility:setup" size="small"
+                        class="slds-icon slds-icon_small"></lightning-icon>
                 </span>
                 <h2 class="slds-card__header-title slds-text-heading_small">Onboarding</h2>
             </div>
             <div class="slds-grid slds-grid_vertical-align-center">
-                <lightning-combobox
-                    name="status"
-                    label=""
-                    value={selectedStatus}
-                    options={statusOptions}
-                    onchange={handleStatusChange}
-                    variant="label-hidden"
-                    class="slds-m-right_small">
-                </lightning-combobox>
-                <lightning-button
-                    label="Generate URL"
-                    variant="brand"
-                    onclick={handleGenerateUrl}>
+                <div class="slds-button-group" role="group" aria-label="Elevator Status">
+                    <lightning-button-group>
+                        <lightning-button 
+                            label="Submitted" 
+                            variant={submittedButtonVariant}
+                            data-status="Submitted"
+                            onclick={handleStatusChange}>
+                        </lightning-button>
+                        <lightning-button 
+                            label="Approved" 
+                            variant={approvedButtonVariant}
+                            data-status="Approved"
+                            class="slds-m-right_small"
+                            onclick={handleStatusChange}>
+                        </lightning-button>
+                    </lightning-button-group>
+                </div>
+                <lightning-button icon-name="utility:socialshare" label="Share" variant="brand" onclick={openShareModal}>
                 </lightning-button>
             </div>
         </div>
-    
-        <!-- Card Body -->
+
+        <!-- ! Card Body - DONE -->
         <div class="slds-card__body slds-card__body_inner">
-            <!-- Info Line -->
+            <!-- ! Info Line - DONE -->
             <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_medium">
                 <div>
                     <p class="slds-text-body_small slds-text-color_weak">
-                        Total Elevators: {totalElevators} / {selectedStatus}: {currentStatusCount}
+                        Total Elevators: {totalCount} / {selectedStatus}: {submittedCount}
                     </p>
                 </div>
                 <div class="search-container">
-                    <lightning-input
-                        type="search"
-                        label="Search Elevators"
-                        variant="label-hidden"
-                        placeholder="Search elevators..."
-                        value={searchTerm}
-                        onchange={handleSearch}>
+                    <lightning-input type="search" label="Search Elevators" variant="label-hidden"
+                        placeholder="Search elevators..." value={elevatorsSearchTerm} onchange={handleSearchElevators}>
                     </lightning-input>
                 </div>
             </div>
 
-            <!-- No Content Banner -->
+            <!-- ! No Content Banner - DONE -->
             <div class="banner" if:true={hasNoElevators}>
-                <c-custom-validation-banner
-                    illustrator="noContent-small"
-                    title="No Elevators Found"
-                ></c-custom-validation-banner>
+                <c-custom-validation-banner illustrator="noContent-small" title="No Elevators Found">
+                </c-custom-validation-banner>
             </div>
-            
-            <!-- Elevator List -->
+
+            <!-- ! Elevator List - DONE -->
             <div if:false={hasNoElevators} class="elevator-list">
                 <template for:each={visibleElevators} for:item="elevator">
-                    <div key={elevator.id} class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-vertical_xx-small slds-p-horizontal_small elevator-item">
+                    <div key={elevator.id}
+                        class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-vertical_xx-small slds-p-horizontal_small elevator-item">
                         <div class="slds-truncate">
                             <span class="slds-text-body_regular">{elevator.name}</span>
                         </div>
-                        <lightning-button
-                            label="Review"
-                            variant="neutral"
-                            size="small"
+                        <lightning-button 
+                            label={buttonLabel}
+                            variant="neutral" 
                             data-elevator-name={elevator.name}
+                            data-elevator-id={elevator.id}
                             onclick={handleReview}>
                         </lightning-button>
                     </div>
                 </template>
             </div>
         </div>
-    
-        <!-- Card Footer -->
+
+        <!-- ! Card Footer -->
         <footer class="slds-card__footer slds-text-align_center">
-            <lightning-button
-                label="Show More"
-                variant="base"
-                onclick={handleShowMore}
-                disabled={showMoreDisabled}>
+            <lightning-button label="Show More" variant="base" onclick={handleShowMore} disabled={showMoreDisabled}>
             </lightning-button>
         </footer>
     </article>
-    
 
-    <!-- Generate URL Modal -->
-    <template if:true={isGenerateUrlModalOpen}>
-        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
+    <!-- ! Share Modal - DONE -->
+    <template if:true={showShareModal}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+            class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container share-modal">
+                <!-- ! Modal Header -->
                 <header class="slds-modal__header">
-                    <lightning-button-icon
-                        icon-name="utility:close"
-                        onclick={closeGenerateUrlModal}
-                        alternative-text="close"
-                        variant="bare-inverse"
-                        class="slds-modal__close">
+                    <lightning-button-icon icon-name="utility:close" onclick={closeShareModal}
+                        alternative-text="close" variant="bare-inverse" class="slds-modal__close">
                     </lightning-button-icon>
-                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Generate URL</h2>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Share</h2>
                 </header>
+
+                <!-- ! Modal Content -->
                 <div class="slds-modal__content slds-p-around_medium">
-                    <p>This is a dummy modal for Generate URL functionality. Replace this with your actual URL generation logic.</p>
+                    <!-- ! Form -->
+                    <template if:false={isSendingEmail}>
+                        <div class="slds-form slds-form_stacked">
+                            <!-- ! From Email Dropdown - DONE -->
+                            <div class="slds-form-element slds-m-bottom_medium">
+                                <lightning-combobox name="fromEmail" label="From:" value={selectedFromEmail}
+                                    options={fromEmailOptions} onchange={handleFromEmailChange} required>
+                                </lightning-combobox>
+                            </div>
+
+                            <!-- ! To Field with Search - DONE -->
+                            <div class="slds-form-element slds-m-bottom_medium">
+                                <label class="slds-form-element__label" for="to-search">
+                                    <span class="slds-required">*</span>To:
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <!-- ! Selected Contacts Pills -->
+                                    <template if:true={hasSelectedContacts}>
+                                        <div class="slds-pill_container slds-m-bottom_x-small">
+                                            <template for:each={selectedContacts} for:item="contact">
+                                                <span key={contact.id} class="slds-pill">
+                                                    <lightning-icon icon-name="standard:contact" size="x-small"
+                                                        class="slds-pill__icon"></lightning-icon>
+                                                    <span class="slds-pill__label">{contact.email}</span>
+                                                    <lightning-button-icon icon-name="utility:close"
+                                                        alternative-text="Remove" variant="bare" size="small"
+                                                        class="slds-pill__remove" data-contact-id={contact.id}
+                                                        onclick={handleRemoveContact}>
+                                                    </lightning-button-icon>
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                    <!-- ! Search Input -->
+                                    <div class="contact-search-container">
+                                        <lightning-input type="search" name="toSearch" placeholder="Search contacts..."
+                                            value={contactSearchTerm} onchange={handleContactSearch} onfocus={handleContactSearchInputFocus}
+                                            onblur={handleContactSearchInputBlur} variant="label-hidden">
+                                        </lightning-input>
+
+                                        <!-- ! Search Results Dropdown -->
+                                        <template if:true={showContactSearchResults}>
+                                            <div class="slds-dropdown slds-dropdown_left contact-search-results-dropdown">
+                                                <ul class="slds-dropdown__list" role="listbox">
+                                                    <!-- ! Search Results -->
+                                                    <template if:false={contactSearchResultsEmpty}>
+                                                        <template for:each={contactSearchResults} for:item="contact">
+                                                            <li key={contact.id} class="slds-dropdown__item"
+                                                                role="presentation">
+                                                                <div class="slds-media slds-media_center slds-p-around_small contact-option"
+                                                                    data-contact-id={contact.id}
+                                                                    onclick={handleContactSelect}>
+                                                                    <div class="slds-media__figure">
+                                                                        <lightning-icon icon-name="standard:contact"
+                                                                            size="small"></lightning-icon>
+                                                                    </div>
+                                                                    <div class="slds-media__body">
+                                                                        <div class="slds-text-body_regular">{contact.name}
+                                                                        </div>
+                                                                        <div
+                                                                            class="slds-text-color_weak slds-text-body_small">
+                                                                            {contact.email}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </template>
+                                                    </template>
+                                                    <!-- ! No Results -->
+                                                    <template if:true={contactSearchResultsEmpty}>
+                                                        <li
+                                                            class="slds-dropdown__item slds-p-around_small slds-text-align_center">
+                                                            <em class="slds-text-color_weak">Keine passenden Ergebnisse gefunden</em>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ! Subject Input - DONE -->
+                            <div class="slds-form-element slds-m-bottom_medium">
+                                <lightning-input type="text" name="subject" label="Subject:" value={emailSubject} disabled required></lightning-input>
+                            </div>
+
+                            <!-- ! Body Input - DONE -->
+                            <div class="slds-form-element slds-m-bottom_medium">
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__label">Body:</div>
+                                    <!-- ! Template Preview - DONE -->
+                                    <div class="template-preview">
+                                        <table style="width:100%; height:100%; border:none; font-family:sans-serif;">
+                                            <tr>
+                                                <td>
+                                                    <table style="width:600px; border:none; margin:0 auto;">
+                                                        <tr>
+                                                            <td style="padding:10px; text-align:center;">
+                                                                <a href="http://www.elevoniq.de">
+                                                                    <img src="/resource/ElevoniqLogo1" alt="Elevoniq Logo"
+                                                                        style="width:300px" />
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding:10px 0 0 10px;">
+                                                                <p style="font-size:1em; font-weight:500; color:#5B2D90;">
+                                                                    Sehr geehrte Damen und Herren,
+                                                                </p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <table style="width:600px; border:none; margin:0 auto;">
+                                                        <tr>
+                                                            <td
+                                                                style="padding:10px 10px 20px 10px; font-size:1em; color:#333;">
+                                                                Sie können jetzt Ihre Aufzugsdaten für den Vertrag
+                                                                {contractName} eingeben.<br /><br />
+                                                                Klicken Sie einfach auf den folgenden Button, um zu starten:
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding:10px; text-align:center;">
+                                                                <a href={onboardingPageLink}
+                                                                    style="background-color:#0070d2; color:white; padding:12px 24px; text-decoration:none; border-radius:4px; font-weight:bold; display:inline-block;">
+                                                                    Daten eingeben
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding:20px 10px 10px 10px;">
+                                                                Bei Fragen können Sie uns jederzeit kontaktieren.
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding:10px;">
+                                                                Mit freundlichen Grüßen
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding:10px;">
+                                                                Max Mustermann<br />
+                                                                <a href="mailto:support@elevoniq.de">support@elevoniq.de</a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- ! Loading Spinner -->
+                    <template if:true={isSendingEmail}>
+                        <div class="slds-text-align_center">
+                            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                        </div>
+                    </template>
                 </div>
-                <footer class="slds-modal__footer">
-                    <lightning-button
-                        label="Cancel"
-                        onclick={closeGenerateUrlModal}>
+
+                <!-- ! Modal Footer -->
+                <footer class="slds-modal__footer slds-modal__footer_directional share-modal-footer">
+                    <lightning-button label="Cancel" onclick={closeShareModal}>
                     </lightning-button>
-                    <lightning-button
-                        variant="brand"
-                        label="Generate"
-                        onclick={closeGenerateUrlModal}>
+                    <lightning-button variant="brand" label="Send" onclick={handleSendEmail}>
                     </lightning-button>
                 </footer>
             </div>
@@ -119,36 +276,192 @@
         <div class="slds-backdrop slds-backdrop_open" onclick={handleModalBackdropClick}></div>
     </template>
 
-    <!-- Review Modal -->
+    <!-- ! Review Modal -->
     <template if:true={isReviewModalOpen}>
-        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <header class="slds-modal__header">
-                    <lightning-button-icon
-                        icon-name="utility:close"
-                        onclick={closeReviewModal}
-                        alternative-text="close"
-                        variant="bare-inverse"
-                        class="slds-modal__close">
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02"
+            class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container review-modal-container">
+                <!-- ! Modal Header -->
+                <header class="slds-modal__header review-header">
+                    <lightning-button-icon icon-name="utility:close" onclick={closeReviewModal} alternative-text="close"
+                        variant="bare-inverse" class="slds-modal__close">
                     </lightning-button-icon>
-                    <h2 id="modal-heading-02" class="slds-modal__title slds-hyphenate">Review Elevator</h2>
+                    <h2 id="modal-heading-02" class="slds-modal__title slds-hyphenate">{buttonLabel} Elevator:
+                        {selectedElevator.name}</h2>
                 </header>
-                <div class="slds-modal__content slds-p-around_medium">
-                    <p>This is a dummy modal for reviewing <strong>{selectedElevatorName}</strong>. Replace this with your actual review functionality.</p>
+
+                <!-- ! Modal Content -->
+                <div class="slds-modal__content slds-p-around_none slds-grid review-modal-content">
+                    <!-- ! Left Sidebar -->
+                    <div class="slds-size_1-of-4 slds-box review-modal-sidebar">
+                        <c-custom-review-progress onstepclick={handleStepClick}></c-custom-review-progress>
+                    </div>
+
+                    <!-- ! Right Sidebar -->
+                    <div class="slds-size_3-of-4 slds-p-around_medium review-modal-content-right">
+                        <!-- ! Top Banner -->
+                        <div class="slds-p-around_small">
+                            <div class="form-header">
+                                <h2 class="form-title">
+                                    {currentStep.label} Details
+                                </h2>
+                                <div class="toggle-container" if:false={currentStep.isOverview}>
+                                    <span class="toggle-label"> Compare Mode</span>
+                                    <div>
+                                        <lightning-input 
+                                            type="toggle" 
+                                            variant="label-hidden"
+                                            message-toggle-active=""
+                                            message-toggle-inactive=""
+                                            class="togglelabelhidden"
+                                            checked={compareMode}
+                                            onchange={handleCompareModeToggle}
+                                            size="small">
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ! Overview Tab -->
+                        <template if:true={currentStep.isOverview}>
+                            <c-onboarding-overview-content overview-data={selectedElevatorDetails}></c-onboarding-overview-content>
+                        </template>
+
+                        <!-- ! Object Tab -->
+                        <template if:false={currentStep.isOverview}>
+                            <template if:true={isContactAvailable}>
+                                <lightning-tabset active-tab-value={currentStep.activeTab}>
+                                    <lightning-tab label="Account" value="account" icon-name="standard:account" onactive={handleTabChange}></lightning-tab>
+                                    <lightning-tab label="Contact" value="contact" icon-name="standard:contact" onactive={handleTabChange}></lightning-tab>
+                                </lightning-tabset>
+                            </template>
+                            <template if:true={currentStep.isOnSiteContacts}>
+                                <lightning-tabset active-tab-value={currentStep.activeTab}>
+                                    <lightning-tab label="Property Manager" value="propertyManager" icon-name="standard:contact" onactive={handleTabChange}></lightning-tab>
+                                    <lightning-tab label="House Keeper" value="houseKeeper" icon-name="standard:contact" onactive={handleTabChange}></lightning-tab>
+                                    <lightning-tab label="Attendant" value="attendant" icon-name="standard:contact" onactive={handleTabChange}></lightning-tab>
+                                    <lightning-tab label="First Aider" value="firstAider" icon-name="standard:contact" onactive={handleTabChange}></lightning-tab>
+                                </lightning-tabset>
+                            </template>
+                            <div class="form-layout">
+                                <!-- ! Previous Object -->
+                                <template if:true={compareMode}>
+                                    <c-onboarding-object-content 
+                                        is-previous={compareMode}
+                                        object-data={currentStepPrevData}
+                                        style="width: 100%;"
+                                    ></c-onboarding-object-content>
+                                </template>
+                                
+                                <!-- ! Current Object -->
+                                <c-onboarding-object-content 
+                                    object-data={currentStepData}
+                                    onrowchange={handleRowChange}
+                                    onfieldchange={handleFieldChange}
+                                    style="width: 100%;"
+                                ></c-onboarding-object-content>
+                            </div>
+                        </template>
+                    </div>
                 </div>
-                <footer class="slds-modal__footer">
-                    <lightning-button
-                        label="Cancel"
-                        onclick={closeReviewModal}>
-                    </lightning-button>
-                    <lightning-button
-                        variant="brand"
-                        label="Save"
-                        onclick={closeReviewModal}>
-                    </lightning-button>
+
+                <!-- ! Modal Footer -->
+                <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
+                    <div>
+                        <lightning-button label="Cancel" onclick={closeReviewModal}>
+                        </lightning-button>
+                    </div>
+                    <div>
+                        <lightning-button variant="brand" label="Approve" onclick={getConfirmation}>
+                        </lightning-button>
+                    </div>
                 </footer>
+
             </div>
         </section>
         <div class="slds-backdrop slds-backdrop_open" onclick={handleModalBackdropClick}></div>
     </template>
+
+    <!-- ! View Modal -->
+    <template if:true={isViewModalOpen}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03"
+            class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container review-modal-container">
+                <!-- ! Modal Header -->
+                <header class="slds-modal__header review-header">
+                    <lightning-button-icon icon-name="utility:close" onclick={closeReviewModal} alternative-text="close"
+                        variant="bare-inverse" class="slds-modal__close">
+                    </lightning-button-icon>
+                    <h2 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{buttonLabel} Elevator:
+                        {selectedElevator.name}</h2>
+                </header>
+
+                <!-- ! Modal Content -->
+                <div class="slds-modal__content slds-p-around_none slds-grid review-modal-content">
+                    <c-onboarding-overview-content overview-data={selectedElevatorDetails} style="overflow: auto !important; width: 100% !important; padding: 15px;"></c-onboarding-overview-content>
+                </div>
+
+                <!-- ! Modal Footer -->
+                <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
+                    <div>
+                        <lightning-button label="Cancel" onclick={closeReviewModal}>
+                        </lightning-button>
+                    </div>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" onclick={handleModalBackdropClick}></div>
+    </template>
+
+    <!-- ! Approved Modal -->
+    <template if:true={showConfirmationModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-modal="true" aria-labelledby="approval-modal-heading" style="background: radial-gradient(black, transparent);">
+            <div class="slds-modal__container">
+                <!-- Header -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeApprovalModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="Close" size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="approval-modal-heading" class="slds-text-heading_medium slds-hyphenate">Confirm Approval</h2>
+                </header>
+                
+                <!-- Body -->
+                <div class="slds-modal__content slds-p-around_medium">
+                    <template if:true={showApprovalLoading}>
+                        <div class="slds-align_absolute-center slds-m-vertical_large">
+                            <lightning-spinner alternative-text="Processing approval" size="medium"></lightning-spinner>
+                            <p class="slds-m-top_small">Processing your request...</p>
+                        </div>
+                    </template>
+                    <template if:false={showApprovalLoading}>
+                        <div class="slds-box slds-theme_default">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-action-approval" title="Approval">
+                                        <lightning-icon icon-name="action:approval" size="small" alternative-text="Approval"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>Are you sure you want to approve this request?</p>
+                                    <p class="slds-m-top_x-small slds-text-color_weak">This action cannot be undone. Please review all details before confirming.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Footer -->
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={closeApprovalModal} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="Submit" onclick={handleApprove}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <!-- Backdrop -->
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
 </template>

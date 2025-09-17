@@ -8,7 +8,7 @@
     <apex:includeLightning />    
     <div id="LwcId" />
     <script>
-            $Lightning.use("c:visualforceAuraApplications", function() {
+            $Lightning.use("c:OnboardingApp", function() {
             $Lightning.createComponent("c:onboardingPageLwc",
             {
                 note   : 'I am coming from VF Page'

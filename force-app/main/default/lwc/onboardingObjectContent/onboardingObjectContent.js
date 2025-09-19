@@ -25,7 +25,11 @@ export default class OnboardingObjectContent extends LightningElement {
     }
 
     get showLookupBtn() {
-        return !this.objectData.title.includes('Order') && !this.isPrevious;
+        return !this.isOrder && !this.isPrevious;
+    }
+
+    get isOrder() {
+        return this.objectData.title.includes('Order');
     }
 
     get selectRowDisabled() {

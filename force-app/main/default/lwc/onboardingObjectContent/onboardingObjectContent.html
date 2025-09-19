@@ -21,6 +21,7 @@
             <div class="section-title">
                 <lightning-icon icon-name={objectData.iconName} class="bluebg-icon" size="small"></lightning-icon>
                 <span>{objectData.title}</span>
+                <span if:false={isOrder} class={objectData.flagClass}>{objectData.flag}</span>
                 <div 
                     data-lookup-fields={objectData.lookupFields} 
                     class="lookup-btn"

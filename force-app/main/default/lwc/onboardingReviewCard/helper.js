@@ -28,12 +28,18 @@ export const prepareObjectData = (objectData, currentStep, isPrevious, isContact
     
     return {
         rowId: obj ? obj.id : '',
+        flag: isExisting(obj) ? 'Existing' : 'New',
+        flagClass: isExisting(obj) ? 'existing-flag' : 'new-flag',
         iconName: isContact ? 'custom:custom15' : iconMap[currentStep.key],
         title: getTitle(currentStep, isContact),
         objectName: getObjectName(currentStep, isContact),
         fields: getFields(obj, currentStep, isContact, isAccount),
         lookupFields: getObjectFields(currentStep, isContact)
     }
+}
+
+const isExisting = (obj) => {
+    return obj && obj.id != null && obj.id.length === 18;
 }
 
 const getObjectName = (currentStep, isContact) => {

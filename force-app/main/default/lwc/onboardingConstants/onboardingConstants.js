@@ -125,8 +125,8 @@ const STEPS = {
         title: "Schritt 1: Liegenschaft",
         icon: "utility:home",
         tasks: [
-            { id: 'property.details', name: "Liegenschaft" },
-            { id: 'property.propertyOwner', name: "Eigentümer" },
+            { id: 'property.details', name: "Liegenschaft", required: true },
+            { id: 'property.propertyOwner', name: "Eigentümer", required: true },
             { id: 'property.assetManager', name: "AM Unternehmen" }
         ]
     },
@@ -134,19 +134,19 @@ const STEPS = {
         title: "Schritt 2: Verwaltungseinheit",
         icon: "utility:puzzle",
         tasks: [
-            { id: 'propertyUnit.details', name: "Verwaltungseinheit" },
+            { id: 'propertyUnit.details', name: "Verwaltungseinheit", required: true },
             { id: 'propertyUnit.pm', name: "PM Unternehmen" },
             { id: 'propertyUnit.fm', name: "FM Unternehmen" },
             { id: 'propertyUnit.hv', name: "HV (Hausverwaltung)" },
-            { id: 'propertyUnit.operator', name: "Betreiber" }
+            { id: 'propertyUnit.operator', name: "Betreiber", required: true }
         ]
     },
     STEP3: {
         title: "Schritt 3: Vor-Ort-Kontakte",
         icon: "utility:people",
         tasks: [
-            { id: 'onSiteContacts.propertyManager', name: "Objektbetreuer" },
-            { id: 'onSiteContacts.houseKeeper', name: "Hausmeister" },
+            { id: 'onSiteContacts.propertyManager', name: "Objektbetreuer", required: true },
+            { id: 'onSiteContacts.houseKeeper', name: "Hausmeister", required: true },
             { id: 'onSiteContacts.attendant', name: "Aufzugswärter" },
             { id: 'onSiteContacts.firstAider', name: "Ersthelfer" }
         ]
@@ -156,9 +156,9 @@ const STEPS = {
         icon: "utility:money",
         tasks: [
             { id: 'order.details', name: "Bestellung" },
-            { id: 'order.productAssignment', name: "Produktzuordnung" },
-            { id: 'order.benefitReceiver', name: "Leistungsempfänger" },
-            { id: 'order.invoiceReceiver', name: "Rechnungsempfänger" }
+            { id: 'order.productAssignment', name: "Produktzuordnung", required: true },
+            { id: 'order.benefitReceiver', name: "Leistungsempfänger", required: true },
+            { id: 'order.invoiceReceiver', name: "Rechnungsempfänger", required: true }
         ]
     }
 };

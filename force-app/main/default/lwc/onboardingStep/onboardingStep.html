@@ -14,7 +14,14 @@
                     <li key={task.id} class={task.className}>
                         <div class="task-content">
                             <div class="task-item-content">
-                                <lightning-helptext if:true={task.isError} icon-name="utility:error" content={task.errorMessage} icon-variant="error" class="task-error"></lightning-helptext>
+                                <template if:true={task.isError}>
+                                    <lightning-helptext if:true={task.isError} icon-name="utility:error" content={task.errorMessage} icon-variant="error" class="task-error"></lightning-helptext>
+                                </template>
+                                <template if:false={task.isError}>
+                                    <template if:true={task.required}>
+                                        <span class="required-star">*</span>
+                                    </template>
+                                </template>
                                 <span class="task-name">{task.name}</span>
                             </div>
                             <template if:true={task.completed}>

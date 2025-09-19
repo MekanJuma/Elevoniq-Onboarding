@@ -109,3 +109,13 @@
     text-decoration: line-through;
     color: #706e6b;
 }
+
+.required-star {
+    color: #ea001e; 
+    margin-right: 4px;
+    font-size: 20px;
+}
+
+.task-item-content {
+    display: flex;
+}

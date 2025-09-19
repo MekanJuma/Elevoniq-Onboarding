@@ -523,7 +523,7 @@ export default class OnboardingPageLwc extends LightningElement {
     async handleUploadCsvModalUpload(event) {
         const { fileName, fileContent } = event.detail;
         this.isLoading = true;
-        // console.log('Uploaded:', fileName, JSON.stringify(fileContent));
+        console.log('Uploaded:', fileName, JSON.stringify(fileContent));
 
         try {
             const extraHeaders = {

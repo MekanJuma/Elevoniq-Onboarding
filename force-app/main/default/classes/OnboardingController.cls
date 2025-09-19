@@ -482,6 +482,7 @@ public without sharing class OnboardingController {
         ];
     
         Invoice_Reciever__c ir = new Invoice_Reciever__c();
+        ir.Name = targetAcc.Name;
         ir.Id = existing.isEmpty() ? null : existing[0].Id;
         ir.Invoice_Receiver__c = targetAcc.Id;
         ir.Street__c = targetAcc.BillingStreet;
@@ -643,6 +644,7 @@ public without sharing class OnboardingController {
         acc.BillingPostalCode = (String) address.get('postalCode');
         acc.Email__c = (String) data.get('email');
         acc.Phone = (String) data.get('phone');
+        acc.Type = (String) data.get('type');
         return acc;
     }
     

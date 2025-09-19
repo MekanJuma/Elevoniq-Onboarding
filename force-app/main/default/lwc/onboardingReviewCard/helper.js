@@ -21,6 +21,17 @@ const PROPERTY_TYPE_OPTIONS = [
     { label: 'Other', value: 'Other' }
 ]
 
+const ACCOUNT_TYPE_OPTIONS = [
+    { label: 'Owner', value: 'Owner' },
+    { label: 'Asset Manager', value: 'Asset Manager' },
+    { label: 'Property Management', value: 'Property Management' },
+    { label: 'Facility Management', value: 'Facility Management' },
+    { label: 'Hausverwaltung', value: 'Hausverwaltung' },
+    { label: 'Service Provider', value: 'Service Provider' },
+    { label: 'Retailer', value: 'Retailer' },
+    { label: 'Manufacturer', value: 'Manufacturer' }
+]
+
 
 export const prepareObjectData = (objectData, currentStep, isPrevious, isContact) => {
     const obj = getObject(objectData, currentStep, isPrevious, isContact);
@@ -102,6 +113,14 @@ const getFields = (obj, currentStep, isContact, isAccount) => {
                 name: 'Name',
                 fieldName: 'name',
                 value: obj ? obj.name : ''
+            },
+            {
+                id: `${currentStep.key}.type`,
+                name: 'Type',
+                fieldName: 'type',
+                isPicklist: true,
+                options: ACCOUNT_TYPE_OPTIONS,
+                value: obj ? obj.type : ''
             },
             {
                 id: `${currentStep.key}.email`,
